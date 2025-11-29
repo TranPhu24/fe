@@ -31,7 +31,6 @@ export function handleLogin(accessToken: string, refreshToken: string, router: A
     sameSite: "Strict",
   });
 
-  // Chuyển trang theo role
   switch (role) {
     case "admin":
       router.push("/dashboard/admin");
@@ -92,5 +91,37 @@ export async function registerApi(
     return { success: false, message: data.message || "Đăng ký thất bại" };
   } else {
     return { success: true, message: data.message || "Đăng ký thành công" };
+  }
+}
+
+export async function sendResetPasswordApi(data: {
+  username: string
+  email: string
+  password: string
+  otp: number
+}): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.message || "Đặt lại mật khẩu thất bại")
+  }
+}
+
+export async function sendOTP(
+  email: string
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email}),
+  });
+
+  if (!res.ok) {
+    throw new Error("Đặt lại mật khẩu thất bại!");
   }
 }

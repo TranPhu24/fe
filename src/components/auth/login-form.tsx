@@ -36,8 +36,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         }
         toast.success("Đăng nhập thành công!");
       } catch (err: unknown) {
-        const 
-          message = err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại!";
+        const message = err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại!";
         toast.error(message);
       } finally {
         setLoading(false);
@@ -72,7 +71,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 <div className="flex items-center">
                   <Label htmlFor="password">Mật khẩu</Label>
                   <a
-                    href="#"
+                    href="./forgot-password"
                     className="ml-auto text-sm underline-offset-4 hover:underline text-red-500"
                   >
                     Quên mật khẩu?
