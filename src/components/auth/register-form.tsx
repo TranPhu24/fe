@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-import { registerApi } from "@/lib/api/user";
+import { registerApi } from "@/lib/api/auth";
 
 export function RegisterForm({
   className,

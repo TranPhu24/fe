@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
-import { sendResetPasswordApi } from "@/lib/api/user"
+import { sendResetPasswordApi } from "@/lib/api/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
