@@ -3,33 +3,29 @@ import Cookies from "js-cookie";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { API_BASE } from "./index";
 
-type DecodedToken = {
-  sub: string;
-  role: "admin" | "user" | "employee";
-  exp: number;
-};
+import type {
+  ApiResponse,
+  RegisterDto,
+  SendOTPDto,
+  ResetPasswordDto,
+  UserRole,
+  DecodedToken,
+  LoginResponseData,
+} from "./types";
 
-// Lưu token + redirect
-export function handleLogin(accessToken: string, refreshToken: string, router: AppRouterInstance) {
+export function handleLogin(
+  accessToken: string,
+  refreshToken: string,
+  router: AppRouterInstance
+) {
   const decoded = jwtDecode<DecodedToken>(accessToken);
 
-  const role = decoded.role;
+  const role = decoded.role as UserRole;
   const userId = decoded.sub;
 
-  Cookies.set("access_token", accessToken, {
-    secure: true,
-    sameSite: "Strict",
-  });
-
-  Cookies.set("refresh_token", refreshToken, {
-    secure: true,
-    sameSite: "Strict",
-  });
-
-  Cookies.set("userId", userId, {
-    secure: true,
-    sameSite: "Strict",
-  });
+  Cookies.set("access_token", accessToken, { secure: true, sameSite: "strict" });
+  Cookies.set("refresh_token", refreshToken, { secure: true, sameSite: "strict" });
+  Cookies.set("userId", userId, { secure: true, sameSite: "strict" });
 
   switch (role) {
     case "admin":
@@ -46,82 +42,103 @@ export function handleLogin(accessToken: string, refreshToken: string, router: A
   }
 }
 
-
 export async function loginApi(
   email: string,
   password: string,
   router: AppRouterInstance
-) {
+): Promise<ApiResponse> {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
 
-  const data = await res.json(); 
+  const data = await res.json();
 
   if (!res.ok) {
-    return { success: false, message: data.message || "Đăng nhập thất bại" };
+    return {
+      success: false,
+      message: data.message|| "Đăng nhập thất bại",
+    };
   }
 
-  const accessToken = data.accessToken;
-  const refreshToken = data.refreshToken;
+  const { accessToken, refreshToken }= data as LoginResponseData;
 
   handleLogin(accessToken, refreshToken, router);
 
-  return { success: true };
+  return {
+    success: true,
+    message: data.message|| "Đăng nhập thành công",
+    data: undefined,
+  };
 }
 
-
 export async function registerApi(
-  username: string,
-  email: string,
-  password: string,
-  role: "user" | "employee" | "admin" = "user"
-): Promise<{ success: boolean; message: string }> {
+  dto: RegisterDto
+): Promise<ApiResponse> {
   const res = await fetch(`${API_BASE}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password, role }),
+    body: JSON.stringify(dto),
   });
 
   const data = await res.json();
 
   if (!res.ok) {
-    return { success: false, message: data.message || "Đăng ký thất bại" };
-  } else {
-    return { success: true, message: data.message || "Đăng ký thành công" };
+    return {
+      success: false,
+      message: data.message|| "Đăng ký thất bại",
+    };
   }
+  return {
+    success: true,
+    message: data.message|| "Đăng ký thành công",
+    data: undefined,
+  };
 }
 
-export async function sendResetPasswordApi(data: {
-  username: string
-  email: string
-  password: string
-  otp: number
-}): Promise<void> {
-  const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  })
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.message || "Đặt lại mật khẩu thất bại")
-  }
-}
-
-export async function sendOTP(
-  email: string
-): Promise<void> {
+export async function sendOTP( dto: SendOTPDto): Promise<ApiResponse> {
   const res = await fetch(`${API_BASE}/api/auth/send-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email}),
+    body: JSON.stringify(dto),
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    throw new Error("Đặt lại mật khẩu thất bại!");
+    return {
+      success: false,
+      message: data.message|| "Gửi mã OTP thất bại!",
+    };
   }
+  return {
+    success: true,
+    message: data.message|| "Mã OTP đã được gửi đến email của bạn",
+    data: undefined,
+  };
+}
+
+export async function sendResetPasswordApi(
+  dto: ResetPasswordDto
+): Promise<ApiResponse> {
+  const res = await fetch(`${API_BASE}/api/auth/reset-password`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(dto),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      success: false,
+      message: data.message|| "Đặt lại mật khẩu thất bại",
+    };
+  }
+  return {
+    success: true,
+    message: data.message|| "Đặt lại mật khẩu thành công",
+    data: undefined,
+  };
 }

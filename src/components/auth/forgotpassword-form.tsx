@@ -24,21 +24,35 @@ export function ForgotPasswordForm({
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const [emailError, setEmailError] = useState("");
 
+    const validateEmail = (value: string) => {
+    if (!value) return "Email không được để trống";
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(value)) return "Email không hợp lệ";
+    return "";
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const emailErr = validateEmail(email);
+    setEmailError(emailErr);
+    if (emailErr ) {
+      toast.error("Vui lòng kiểm tra thông tin!");
+      return;
+    }
     setLoading(true)
     try {
-      await sendOTP(email)
+      const result = await sendOTP({email})
+        if (!result.success) {
+        toast.error(result.message || "Gửi mã OTP thất bại!");
+        return;
+      }
       toast.success("Mã xác nhận đã được gửi đến email của bạn!")
-
       router.push("/auth/verify-code")
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message || "Yêu cầu đặt lại mật khẩu thất bại!")
-      } else {
-        toast.error("Yêu cầu đặt lại mật khẩu thất bại!")
-      }
+      const message =err instanceof Error? err.message: "Có lỗi xảy ra, vui lòng thử lại!";
+      toast.error(message);
     } finally {
       setLoading(false)
     }
@@ -62,10 +76,13 @@ export function ForgotPasswordForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError(validateEmail(e.target.value));
+                  }}
                 />
+                {emailError && <p className="text-sm text-red-500">{emailError}</p>}
               </div>
               <Button type="submit" className="w-full  bg-red-500 hover:bg-red-600" disabled={loading}>
                 {loading ? "Đang gửi..." : "Gửi mã xác nhận"}

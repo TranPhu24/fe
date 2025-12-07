@@ -21,17 +21,39 @@ export function ResetPasswordWithCodeForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [otp, setOtp] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
+    const validateEmail = (value: string) => {
+    if (!value) return "Email không được để trống";
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(value)) return "Email không hợp lệ";
+    return "";
+  };
 
+  const validatePassword = (value: string) => {
+    if (!value) return "Mật khẩu không được để trống";
+    if (value.length < 6) return "Mật khẩu phải ít nhất 6 ký tự";
+    return "";
+  };
    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const emailErr = validateEmail(email);
+    const passErr = validatePassword(newPassword);
+
+    setEmailError(emailErr);
+    setPasswordError(passErr);
+
+    if (emailErr || passErr) {
+      toast.error("Vui lòng kiểm tra thông tin!");
+      return;
+    }
     if (newPassword !== confirmPassword) {
       toast.error("Mật khẩu xác nhận không khớp!")
       return
@@ -40,7 +62,6 @@ export function ResetPasswordWithCodeForm({
     setLoading(true)
     try {
       await sendResetPasswordApi({
-        username,
         email,
         password: newPassword,
         otp: Number(otp),
@@ -48,11 +69,8 @@ export function ResetPasswordWithCodeForm({
       toast.success("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.")
       router.push("/auth/login")
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        toast.error(err.message || "Đặt lại mật khẩu thất bại!")
-      } else {
-        toast.error("Đặt lại mật khẩu thất bại!")
-      }
+      const message =err instanceof Error? err.message: "Có lỗi xảy ra, vui lòng thử lại!";
+      toast.error(message);
     } finally {
       setLoading(false)
     }
@@ -70,27 +88,20 @@ export function ResetPasswordWithCodeForm({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="username">Tên đăng nhập</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="username"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setEmailError(validateEmail(e.target.value));
+                  }}
                 />
+                {emailError && <p className="text-sm text-red-500">{emailError}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="otp">Mã xác nhận (OTP)</Label>
@@ -111,8 +122,12 @@ export function ResetPasswordWithCodeForm({
                   placeholder="••••••••"
                   required
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setPasswordError(validatePassword(e.target.value));
+                  }}
                 />
+                  {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="confirm-password">Xác nhận mật khẩu</Label>
@@ -122,8 +137,11 @@ export function ResetPasswordWithCodeForm({
                   placeholder="••••••••"
                   required
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {setConfirmPassword(e.target.value);
+                  setPasswordError(validatePassword(e.target.value));
+                  }}
                 />
+                {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
               </div>
               <Button type="submit" className="w-full  bg-red-500 hover:bg-red-600" disabled={loading}>
                 {loading ? "Đang xử lý..." : "Xác nhận đổi mật khẩu"}
