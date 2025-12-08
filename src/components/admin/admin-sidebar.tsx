@@ -74,7 +74,7 @@ const menuItems = [
 export function AppSidebar() {
   const router = useRouter()
   const pathname = usePathname()
-  const [openProductMenu, setOpenProductMenu] = useState(true) // mặc định mở
+  const [openProductMenu, setOpenProductMenu] = useState(true) 
 
   const handleLogout = () => {
     Cookies.remove("access_token")

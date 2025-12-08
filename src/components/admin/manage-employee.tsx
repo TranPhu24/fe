@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+//import * as XLSX from "xlsx";
 
 import { getAllEmployees, createEmployee, deleteEmployee } from "@/lib/api/admin";
 import type { Employee } from "@/lib/api/types";
@@ -56,10 +56,10 @@ export function AccountForm() {
   const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
-    loadEmployees();
+    loadData();
   }, []);
 
-  const loadEmployees = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
       const result = await getAllEmployees();
@@ -70,8 +70,9 @@ export function AccountForm() {
       } else {
         toast.error(result.message || "Không thể tải danh sách nhân viên");
       }
-    } catch {
-      toast.error("Lỗi kết nối server");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Lỗi tải nhân viên";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -123,7 +124,7 @@ export function AccountForm() {
       setPassword("");
       setPhone("");
 
-      await loadEmployees();
+      await loadData();
     } catch {
       toast.error("Có lỗi xảy ra khi tạo nhân viên");
     } finally {
@@ -149,7 +150,7 @@ export function AccountForm() {
     }
   };
 
-  const handleImportExcel = async (e: ChangeEvent<HTMLInputElement>) => {
+  /*const handleImportExcel = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -191,7 +192,7 @@ export function AccountForm() {
       e.target.value = "";
     }
   };
-
+*/
   const filteredEmployees = employees.filter(
     (emp) =>
       emp.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -289,6 +290,7 @@ export function AccountForm() {
             </DialogContent>
           </Dialog>
 
+          {/* 
           <Button asChild className="bg-gray-700 text-white hover:bg-gray-900">
             <label className="cursor-pointer">
               Nhập từ Excel
@@ -300,6 +302,8 @@ export function AccountForm() {
               />
             </label>
           </Button>
+          */}
+
         </div>
       </div>
 
@@ -310,7 +314,7 @@ export function AccountForm() {
           </BreadcrumbItem>
           <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/admin/employees">Nhân viên</BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard/admin/account">Nhân viên</BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

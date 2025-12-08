@@ -159,7 +159,7 @@ export  function CategoryPage() {
             <SlashIcon />
           </BreadcrumbSeparator>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/admin/categories">
+            <BreadcrumbLink href="/dashboard/admin/product/category">
               Danh mục
             </BreadcrumbLink>
           </BreadcrumbItem>

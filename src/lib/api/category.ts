@@ -48,9 +48,10 @@ export async function getAllCategories(): Promise<
   return {
     success: true,
     message: data.message ?? "Lấy danh sách thành công",
-    data: { categories: data },
+    data: { categories: data as Category[] }
   };
 }
+
 export async function updateCategory(
   id: string,
   dto: UpdateCategoryDto

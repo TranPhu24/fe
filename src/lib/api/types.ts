@@ -60,8 +60,7 @@ export interface Category {
   _id: string;
   name: string;
   description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+
 }
 
 export interface CreateCategoryDto {
@@ -72,4 +71,40 @@ export interface CreateCategoryDto {
 export interface UpdateCategoryDto {
   name?: string;
   description?: string;
+}
+
+// food
+// types/product.ts
+export interface CategoryRef {
+  _id: string
+  name: string
+}
+
+export interface Product {
+  _id: string
+  name: string
+  price: number
+  image: string
+  description: string
+  category: string | CategoryRef
+  stock: number
+
+}
+
+export interface CreateProductDto {
+  name: string
+  price: number
+  description: string
+  category: string
+  stock: number
+  image: File 
+}
+
+export interface UpdateProductDto {
+  name?: string
+  price?: number
+  description?: string
+  category?: string
+  stock?: number
+  image?: File | null 
 }
