@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, ChangeEvent } from "react";
-import Image from "next/image"
 import {
   createProduct,
   getProducts,
@@ -39,6 +38,7 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import Image from "next/image";
 
 export function ProductPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -329,7 +329,11 @@ export function ProductPage() {
                 <Label>Ảnh sản phẩm {editingProduct ? "(Để trống nếu không thay đổi)" : "*"}</Label>
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="mx-auto max-h-48 rounded object-cover" />
+                    <Image src={imagePreview} 
+                    alt="Preview" 
+                      width={400}
+                      height={300}
+                    className="mx-auto max-h-48 rounded object-cover" />
                   ) : (
                     <div className="text-gray-400">
                       <Upload className="mx-auto h-12 w-12 mb-2" />
@@ -427,11 +431,12 @@ export function ProductPage() {
               paginatedProducts.map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4">
-                    <img
+                    <Image
                       src={product.image || "/placeholder.jpg"}
                       alt={product.name}
+                      width={300}
+                      height={200}
                       className="h-12 w-12 object-cover rounded bg-gray-100"
-                      onError={(e) => (e.currentTarget.src = "/placeholder.jpg")}
                     />
                   </td>
                   <td className="px-6 py-4 font-medium truncate">{product.name}</td>

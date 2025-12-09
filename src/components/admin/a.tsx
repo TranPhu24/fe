@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -44,49 +43,37 @@ export default function Home() {
   const loadCategories = async () => {
     try {
       setLoadingCategories(true);
-
       const res = await getAllCategories();
       if (!res.success) {
         toast.error(res.message);
         return;
       }
-
-      const categories = res.data!.categories;
-      setCategories(categories);
-
-      if (categories.length > 0) {
-        setActiveCategory(categories[0].name);
+      setCategories(res.data!.categories);
+      if (res.data!.categories.length > 0) {
+        setActiveCategory(res.data!.categories[0].name);
       }
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Lỗi tải danh mục";
-      toast.error(message);
+    } catch {
+      toast.error("Lỗi tải danh mục");
     } finally {
       setLoadingCategories(false);
     }
   };
 
-
   const loadProducts = async () => {
+    setLoadingProducts(true);
     try {
-      setLoadingProducts(true);
-
-      const res = await getProducts();
-      if (!res.success) {
-        toast.error(res.message || "Không tải được sản phẩm");
+      const { success, message, data } = await getProducts();
+      if (!success) {
+        toast.error(message || "Không tải được sản phẩm");
         return;
       }
-
-      setProducts(res.data?.products ?? []);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Lỗi kết nối server";
-      toast.error(message);
+      setProducts(data?.products ?? []);
+    } catch {
+      toast.error("Lỗi kết nối server");
     } finally {
       setLoadingProducts(false);
     }
   };
-
 
   /* ================= SCROLL SPY ================= */
   useEffect(() => {
@@ -113,20 +100,21 @@ export default function Home() {
     });
 
     return () => observer.disconnect();
-      }, [categories]);
+  }, [categories]);
 
-      const productsByCategory = categories.map((c) => ({
-        category: c,
-        products: products.filter(
-          (p) => typeof p.category === 'object' && p.category?.name === c.name
-        ),
-      }));
+  /* ================= GROUP PRODUCTS ================= */
+  const productsByCategory = categories.map((c) => ({
+    category: c,
+    products: products.filter(
+      (p) => p.category?.name === c.name
+    ),
+  }));
 
   /* ================= RENDER ================= */
   return (
     <>
       <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
           <div></div>
 
@@ -193,9 +181,9 @@ export default function Home() {
             <div className="w-12 h-1 bg-red-600 rounded-full mx-auto mt-2" />
           </div>
 
-        <p className="text-center text-gray-700 text-base mt-6 leading-relaxed">
-          Bạn có muốn gọi đến <strong>1900 1822 </strong>không?
-        </p>
+          <p className="text-center text-gray-700 text-sm mt-6 leading-relaxed">
+            Bạn có muốn gọi đến <strong>1900 1822</strong> không?
+          </p>
 
           <div className="grid grid-cols-2 gap-4 mt-8">
             <button
@@ -220,29 +208,21 @@ export default function Home() {
       </Dialog>
       </header>
 
-      <nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
+      {/* ================= MENU NAV ================= */}
+      <nav className="bg-white sticky top-[64px] z-40 border-b">
         <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
-          <div className="flex gap-12 py-8 whitespace-nowrap relative">
-
-            {loadingCategories ? (
+          <div className="flex gap-6 py-4 whitespace-nowrap">
+            {loadingCategories &&
               Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-36 h-8 bg-gray-200 animate-pulse rounded-lg"
-                />
-              ))
-            ) : (
+                <div key={i} className="w-24 h-5 bg-gray-200 animate-pulse rounded" />
+              ))}
+
+            {!loadingCategories &&
               categories.map((c) => (
                 <a
                   key={c._id}
                   href={`#${c.name}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document
-                      .getElementById(c.name)
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 relative
+                  className={`font-medium text-sm pb-2 border-b-2 transition-colors
                     ${
                       activeCategory === c.name
                         ? "text-red-600 border-red-600"
@@ -251,24 +231,20 @@ export default function Home() {
                 >
                   {c.name}
                 </a>
-              ))
-            )}
+              ))}
           </div>
         </div>
       </nav>
 
-
       {/* ================= PRODUCTS ================= */}
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-14">
         {productsByCategory.map(({ category, products }) => (
           <section
             key={category._id}
             id={category.name}
             data-category={category.name}
-            ref={(el) => {
-              sectionRefs.current[category.name] = el;
-            }}
-            className="scroll-mt-48"
+            ref={(el) => (sectionRefs.current[category.name] = el)}
+            className="scroll-mt-40"
           >
             <h2 className="text-2xl font-bold mb-6">
               {category.name}
@@ -307,27 +283,14 @@ export default function Home() {
           </section>
         ))}
       </main>
-        <footer className="bg-gray-900 text-gray-400 py-12 mt-24">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <p className="text-sm">© 2025 AppFoodPL - Giao đồ ăn nhanh</p>
-              
-              <div className="flex items-center gap-8 text-sm">
-                <a href="tel:19001822" className="hover:text-red-400 transition">
-                  Hotline: <span className="text-red-400 font-bold">1900 1822</span>
-                </a>
-                <span>|</span>
-                <a href="#" className="hover:text-red-400 transition">Chính sách bảo mật</a>
-                <span>|</span>
-                <div className="flex gap-3">
-                  <Facebook className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
-                  <Instagram className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </footer>
 
+      {/* ================= SUPPORT DIALOG ================= */}
+      <Dialog open={openSupport} onOpenChange={setOpenSupport}>
+        <DialogContent className="max-w-sm rounded-2xl p-6">
+          <DialogTitle>Hỗ trợ khách hàng</DialogTitle>
+          <p>Bạn có muốn gọi 1900 1822 không?</p>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

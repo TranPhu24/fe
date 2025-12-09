@@ -23,7 +23,7 @@ export async function createProduct(
   if (dto.description?.trim()) formData.append("description", dto.description.trim())
   formData.append("category", dto.category)
   formData.append("stock", dto.stock.toString())
-  formData.append("image", dto.image, dto.image.name) // quan trọng: thêm tên file
+  formData.append("image", dto.image, dto.image.name) 
 
   const res = await fetch(`${API_BASE}/api/products`, {
     method: "POST",
@@ -79,6 +79,36 @@ export async function getProducts(): Promise<
     },
   }
 }
+export async function getProduct(
+  id: string
+): Promise<ApiResponse<{ product: Product }>> {
+  const accessToken = Cookies.get("access_token")
+
+  const res = await fetch(`${API_BASE}/api/products/${id}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  })
+
+  const data = await res.json()
+
+  if (!res.ok) {
+    return {
+      success: false,
+      message: data.message || "Không thể lấy sản phẩm",
+    }
+  }
+
+  return {
+    success: true,
+    message: "Lấy sản phẩm thành công",
+    data: {
+      product: data.product || data.data?.product,
+    },
+  }
+}
 
 
 export async function updateProduct(
@@ -99,7 +129,6 @@ export async function updateProduct(
   if (dto.stock !== undefined) formData.append("stock", dto.stock.toString())
 
   if (dto.image instanceof File) {
-    // Ảnh mới → upload
     formData.append("image", dto.image, dto.image.name)
     isMultipart = true
   }

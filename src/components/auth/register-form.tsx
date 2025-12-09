@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -203,12 +204,12 @@ export function RegisterForm({
 
             <div className="mt-4 text-center text-sm">
               Đã có tài khoản?{" "}
-              <a
+              <Link
                 href="/auth/login"
                 className="underline underline-offset-4 text-red-500"
               >
                 Đăng nhập ngay
-              </a>
+              </Link>
             </div>
           </form>
         </CardContent>
