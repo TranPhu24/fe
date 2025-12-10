@@ -120,7 +120,6 @@ export async function updateProduct(
   const formData = new FormData()
   let isMultipart = false
 
-  // Thêm dữ liệu text (nếu có)
   if (dto.name !== undefined) formData.append("name", dto.name.trim())
   if (dto.price !== undefined) formData.append("price", dto.price.toString())
   if (dto.description !== undefined)

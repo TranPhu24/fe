@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, X, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -18,9 +18,10 @@ import {
 import { Bell, ShoppingCart, User } from "lucide-react";
 import { toast } from "sonner";
 
+
 import { Category, Product } from "@/lib/api/types";
 import { getAllCategories } from "@/lib/api/category";
-import { getProducts } from "@/lib/api/product";
+import { getProducts, getProduct } from "@/lib/api/product";
 
 export default function Home() {
   const [openSupport, setOpenSupport] = useState(false);
@@ -30,16 +31,24 @@ export default function Home() {
 
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [openProductDetail, setOpenProductDetail] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   const [activeCategory, setActiveCategory] = useState<string>("");
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     loadCategories();
     loadProducts();
   }, []);
+  useEffect(() => {
+    if (openProductDetail) {
+      setQuantity(1);
+    }
+  }, [openProductDetail]);
 
   const loadCategories = async () => {
     try {
@@ -66,7 +75,6 @@ export default function Home() {
     }
   };
 
-
   const loadProducts = async () => {
     try {
       setLoadingProducts(true);
@@ -87,11 +95,36 @@ export default function Home() {
     }
   };
 
+const loadProduct = async (productId: string) => {
+  try {
+    setLoadingProduct(true);
+    setSelectedProduct(null); // reset trước khi load
 
-  /* ================= SCROLL SPY ================= */
+    const res = await getProduct(productId);
+    if (!res.success) {
+      toast.error(res.message || "Không tải được sản phẩm");
+      return;
+    }
+
+    const product = res.data!.product;
+    setSelectedProduct(product);
+    setOpenProductDetail(true); // Mở modal chi tiết
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Lỗi tải sản phẩm";
+    toast.error(message);
+  } finally {
+    setLoadingProduct(false);
+  }
+};
+
+  const handleOpenProductDetail = (product: Product) => {
+    if (product._id) {
+      loadProduct(product._id);
+    } 
+  };
+
   useEffect(() => {
     if (!categories.length) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -121,8 +154,6 @@ export default function Home() {
           (p) => typeof p.category === 'object' && p.category?.name === c.name
         ),
       }));
-
-  /* ================= RENDER ================= */
   return (
     <>
       <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -220,6 +251,7 @@ export default function Home() {
       </Dialog>
       </header>
 
+      {/* Category */}
       <nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
           <div className="flex gap-12 py-8 whitespace-nowrap relative">
@@ -258,7 +290,7 @@ export default function Home() {
       </nav>
 
 
-      {/* ================= PRODUCTS ================= */}
+      {/*Products */}
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
         {productsByCategory.map(({ category, products }) => (
           <section
@@ -277,7 +309,10 @@ export default function Home() {
             {loadingProducts ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-48 bg-gray-200 animate-pulse rounded-xl" />
+                  <div
+                    key={i}
+                    className="h-48 bg-gray-200 animate-pulse rounded-xl"
+                  />
                 ))}
               </div>
             ) : (
@@ -285,7 +320,8 @@ export default function Home() {
                 {products.map((p) => (
                   <div
                     key={p._id}
-                    className="bg-white rounded-xl shadow hover:shadow-lg transition"
+                    className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer"
+                    onClick={() => handleOpenProductDetail(p)}
                   >
                     <Image
                       src={p.image || "/placeholder.jpg"}
@@ -294,8 +330,12 @@ export default function Home() {
                       height={200}
                       className="w-full h-40 object-cover rounded-t-xl"
                     />
+
                     <div className="p-4 text-center">
-                      <h3 className="font-semibold">{p.name}</h3>
+                      <h3 className="font-semibold line-clamp-1">
+                        {p.name}
+                      </h3>
+
                       <p className="text-red-600 font-bold mt-1">
                         {p.price.toLocaleString()}đ
                       </p>
@@ -307,26 +347,105 @@ export default function Home() {
           </section>
         ))}
       </main>
-        <footer className="bg-gray-900 text-gray-400 py-12 mt-24">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <p className="text-sm">© 2025 AppFoodPL - Giao đồ ăn nhanh</p>
-              
-              <div className="flex items-center gap-8 text-sm">
-                <a href="tel:19001822" className="hover:text-red-400 transition">
-                  Hotline: <span className="text-red-400 font-bold">1900 1822</span>
-                </a>
-                <span>|</span>
-                <a href="#" className="hover:text-red-400 transition">Chính sách bảo mật</a>
-                <span>|</span>
-                <div className="flex gap-3">
-                  <Facebook className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
-                  <Instagram className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
+      <Dialog open={openProductDetail} onOpenChange={setOpenProductDetail}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl shadow-2xl">
+          <DialogTitle className="sr-only">
+            {selectedProduct?.name ?? "Chi tiết sản phẩm"}
+          </DialogTitle>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setOpenProductDetail(false)}
+              aria-label="Đóng"
+              className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-white transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="relative h-80 bg-gray-100">
+              <Image
+                src={selectedProduct?.image || "/placeholder.jpg"}
+                alt={selectedProduct?.name || "Món ăn"}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            <div className="p-6 space-y-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {selectedProduct?.name}
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed">
+                {selectedProduct?.description || "Món ăn thơm ngon, chất lượng cao cấp."}
+              </p>
+
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex items-center gap-5">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-11 h-11 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
+                    aria-label="Giảm số lượng"
+                  >
+                    <Minus className="w-5 h-5" />
+                  </button>
+
+                  <span className="text-2xl font-bold w-16 text-center">{quantity}</span>
+
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-11 h-11 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
+                    aria-label="Tăng số lượng"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.success(`Đã thêm ${quantity} × ${selectedProduct?.name || "sản phẩm"} vào giỏ hàng!`);
+                    setOpenProductDetail(false);
+                    // TODO: addToCart({ product: selectedProduct, quantity })
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-lg px-6 py-3 rounded-full shadow-xl transition-all flex items-center gap-3"
+                  aria-label="Thêm vào giỏ hàng"
+                >
+                  <span>Thêm vào giỏ hàng</span>
+                  <span className="font-bold">
+                    • {(selectedProduct?.price ? (selectedProduct.price * quantity) : 0).toLocaleString()}đ
+                  </span>
+                </button>
               </div>
             </div>
           </div>
-        </footer>
+        </DialogContent>
+      </Dialog>
+
+      <footer className="bg-gray-900 text-gray-400 py-12 mt-24">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-sm">© 2025 AppFoodPL - Giao đồ ăn nhanh</p>
+            
+            <div className="flex items-center gap-8 text-sm">
+              <a href="tel:19001822" className="hover:text-red-400 transition">
+                Hotline: <span className="text-red-400 font-bold">1900 1822</span>
+              </a>
+              <span>|</span>
+              <a href="#" className="hover:text-red-400 transition">Chính sách bảo mật</a>
+              <span>|</span>
+              <div className="flex gap-3">
+                <Facebook className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
+                <Instagram className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </>
   );
