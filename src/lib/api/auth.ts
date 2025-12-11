@@ -35,7 +35,7 @@ export function handleLogin(
       router.push("/dashboard/employee");
       break;
     case "user":
-      router.push("/dashboard/user");
+      router.push("/");
       break;
     default:
       router.push("/");

@@ -74,7 +74,7 @@ export interface UpdateCategoryDto {
 }
 
 // food
-// types/product.ts
+
 export interface CategoryRef {
   _id: string
   name: string
@@ -107,4 +107,20 @@ export interface UpdateProductDto {
   category?: string
   stock?: number
   image?: File | null 
+}
+
+
+//cart
+export interface CartItem {
+  product: Product
+  quantity: number
+  price: number
+}
+
+export interface Cart {
+  _id: string
+  user: string
+  items: CartItem[]
+  totalQuantity: number
+  totalPrice: number
 }

@@ -145,7 +145,7 @@ export function LoginForm({
             <div className="mt-4 text-center text-sm">
               Không có tài khoản?{" "}
               <Link
-                href="/register"
+                href="./register"
                 className="underline underline-offset-4 text-red-500"
               >
                 Đăng ký
