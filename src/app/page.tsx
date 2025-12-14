@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Facebook, Instagram, X, Minus, Plus } from "lucide-react";
+import { Facebook, Instagram, X, Minus, Plus,  Bell, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -15,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell, ShoppingCart, User } from "lucide-react";
 import { toast } from "sonner";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 
 import { Category, Product } from "@/lib/api/types";
@@ -24,8 +24,14 @@ import { getAllCategories } from "@/lib/api/category";
 import { getProducts, getProduct } from "@/lib/api/product";
 import { addToCart, getCart } from "@/lib/api/cart";
 
-
+const banners = [
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765608918/foodapp/mmat8b39j0padnqpsp4r.png",
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765609022/foodapp/ouselslipeeclr2bss8m.png",
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765608971/foodapp/kjs2sscj6wdpkdnmkddr.png",
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765607909/Screenshot_2025-12-13_133738_pitczb.png"
+];
 export default function Home() {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [openSupport, setOpenSupport] = useState(false);
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -35,6 +41,7 @@ export default function Home() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [openProductDetail, setOpenProductDetail] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -43,6 +50,8 @@ export default function Home() {
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 
 
   useEffect(() => {
@@ -184,11 +193,24 @@ export default function Home() {
       (p) => typeof p.category === 'object' && p.category?.name === c.name
     ),
   }));
+
+  useEffect(() => {
+  if (searchQuery.trim() === "") {
+    setFilteredProducts([]);
+    return;
+  }
+
+  const query = searchQuery.toLowerCase().trim();
+  const filtered = products.filter((p) =>
+    p.name.toLowerCase().includes(query)
+  );
+
+  setFilteredProducts(filtered);
+}, [searchQuery, products]);
   return (
   <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-
         <div></div>
 
         <div className="flex items-center gap-6">
@@ -229,7 +251,7 @@ export default function Home() {
 
                 <DropdownMenuItem asChild>
                   <Link
-                    href="/orders/track"
+                    href="/dashboard/user/order/listorder"
                     className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
                   >
                     Theo dõi đơn hàng
@@ -281,104 +303,213 @@ export default function Home() {
       </DialogContent>
     </Dialog>
     </header>
+    <section className="w-full bg-white">
+      <Carousel opts={{ loop: true }} className="w-full">
+        <CarouselContent>
+          {banners.map((src, index) => (
+            <CarouselItem key={index}>
+              <div className="relative w-full h-[180px] md:h-[260px] lg:h-[480px] overflow-hidden">
+                <Image
+                  src={src}
+                  alt={`Banner ${index + 1}`}
+                  fill
+                  priority={index === 0}
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-black/25" />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-4 bg-white/90 hover:bg-white" />
+        <CarouselNext className="right-4 bg-white/90 hover:bg-white" />
+      </Carousel>
+    </section>
 
     {/* Category */}
     <nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
-        <div className="flex gap-12 py-8 whitespace-nowrap relative">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center gap-8 lg:gap-12 py-6 overflow-x-auto scrollbar-hide">
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="flex items-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-200 whitespace-nowrap"
+              aria-label="Mở/đóng tìm kiếm"
+            >
+              <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
 
-          {loadingCategories ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-36 h-8 bg-gray-200 animate-pulse rounded-lg"
+          <div className={`transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-w-2xl opacity-100' : 'max-w-0 opacity-0'} overflow-hidden`}>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Tìm kiếm món ăn..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus
+                className="w-full min-w-[300px] px-5 py-3 pl-12 pr-12 text-lg font-bold rounded-full border border-gray-300 focus:border-red-500 focus:outline-none shadow-md transition-all"
               />
-            ))
-          ) : (
-            categories.map((c) => (
-              <a
-                key={c._id}
-                href={`#${c.name}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document
-                    .getElementById(c.name)
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-                className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 relative
-                  ${
-                    activeCategory === c.name
+            
+              {isSearchOpen && (
+                <button
+                  onClick={() => {
+                    if (searchQuery) {
+                      setSearchQuery(""); 
+                    } else {
+                      setIsSearchOpen(false); 
+                    }
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap flex-1">
+            {loadingCategories ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
+              ))
+            ) : (
+              categories.map((c) => (
+                <a
+                  key={c._id}
+                  href={`#${c.name}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
+                    ${activeCategory === c.name
                       ? "text-red-600 border-red-600"
                       : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
-                  }`}
-              >
-                {c.name}
-              </a>
-            ))
-          )}
+                    }`}
+                >
+                  {c.name}
+                </a>
+              ))
+            )}
+          </div>
         </div>
       </div>
     </nav>
 
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
 
-    {/*Products */}
-    <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
-      
-      {productsByCategory.map(({ category, products }) => (
-        <section
-          key={category._id}
-          id={category.name}
-          data-category={category.name}
-          ref={(el) => {
-            sectionRefs.current[category.name] = el;
-          }}
-          className="scroll-mt-48"
-        >
-          <h2 className="text-2xl font-bold mb-6">
-            {category.name}
-          </h2>
+        {searchQuery.trim() !== "" ? (
+          <section className="scroll-mt-32">
+            <h2 className="text-2xl font-bold mb-6">
+              Kết quả tìm kiếm cho &quot;{searchQuery}
+              <span className="text-lg font-normal text-gray-600 ml-3">
+                ({filteredProducts.length} món)
+              </span>
+            </h2>
 
-          {loadingProducts ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-48 bg-gray-200 animate-pulse rounded-xl"
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {products.map((p) => (
-                <div
-                  key={p._id}
-                  className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer"
-                  onClick={() => handleOpenProductDetail(p)}
-                >
-                  <Image
-                    src={p.image || "/placeholder.jpg"}
-                    alt={p.name}
-                    width={300}
-                    height={200}
-                    className="w-full h-40 object-cover rounded-t-xl"
-                  />
-
-                  <div className="p-4 text-center">
-                    <h3 className="font-semibold line-clamp-1">
-                      {p.name}
-                    </h3>
-
-                    <p className="text-red-600 font-bold mt-1">
-                      {p.price.toLocaleString()}đ
-                    </p>
-                  </div>
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-20 bg-gray-50 rounded-2xl">
+                <div className="mx-auto w-32 h-32 mb-6 opacity-50">
+                  <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
-      ))}
-    </main>
+                <p className="text-xl text-gray-600 font-medium">Không tìm thấy món ăn nào</p>
+                <p className="text-gray-500 mt-2">Thử dùng từ khóa khác nhé!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {filteredProducts.map((p) => (
+                  <div
+                    key={p._id}
+                    className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
+                    onClick={() => handleOpenProductDetail(p)}
+                  >
+                    <Image
+                      src={p.image || "/placeholder.jpg"}
+                      alt={p.name}
+                      width={300}
+                      height={200}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-4 text-center">
+                      <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
+                        {p.name}
+                      </h3>
+                      <p className="text-red-600 font-bold mt-2 text-lg">
+                        {p.price.toLocaleString()}đ
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        ) : (
+          <>
+            {productsByCategory.length === 0 && !loadingProducts ? (
+              <div className="text-center py-20">
+                <p className="text-xl text-gray-600">Chưa có sản phẩm nào</p>
+              </div>
+            ) : (
+              productsByCategory.map(({ category, products }) => (
+                <section
+                  key={category._id}
+                  id={category.name}
+                  data-category={category.name}
+                  ref={(el) => {
+                    sectionRefs.current[category.name] = el;
+                  }}
+                  className="scroll-mt-48"
+                >
+                  <h2 className="text-2xl font-bold mb-6">{category.name}</h2>
+
+                  {loadingProducts ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
+                      ))}
+                    </div>
+                  ) : products.length === 0 ? (
+                    <p className="text-center text-gray-500 py-12 text-lg">
+                      Chưa có sản phẩm trong danh mục này
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      {products.map((p) => (
+                        <div
+                          key={p._id}
+                          className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
+                          onClick={() => handleOpenProductDetail(p)}
+                        >
+                          <Image
+                            src={p.image || "/placeholder.jpg"}
+                            alt={p.name}
+                            width={300}
+                            height={200}
+                            className="w-full h-40 object-cover"
+                          />
+                          <div className="p-4 text-center">
+                            <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
+                              {p.name}
+                            </h3>
+                            <p className="text-red-600 font-bold mt-2 text-lg">
+                              {p.price.toLocaleString()}đ
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              ))
+            )}
+          </>
+        )}
+      </main>
     <Dialog open={openProductDetail} onOpenChange={setOpenProductDetail}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl shadow-2xl">
         <DialogTitle className="sr-only">
@@ -474,7 +605,6 @@ export default function Home() {
         </div>
       </div>
     </footer>
-
   </>
   );
 }

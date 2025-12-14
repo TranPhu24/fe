@@ -124,3 +124,86 @@ export interface Cart {
   totalQuantity: number
   totalPrice: number
 }
+
+export interface OrderItem {
+  product: string;       
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+}
+export interface ShippingAddress {
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  ward: string;
+}
+
+type PaymentMethod = "COD" | "VNPAY";
+
+type PaymentStatus =
+  | "pending"
+  | "paid"
+  | "failed"
+  | "refunded";
+
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "preparing"
+  | "shipping"
+  | "completed"
+  | "cancelled";
+
+type CancelledBy = "user" | "employee" | "admin";
+export interface Order {
+  _id: string;
+
+  user: string; 
+
+  items: OrderItem[];
+
+  shippingAddress: ShippingAddress;
+
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+
+  orderStatus: OrderStatus;
+
+  handledBy?: string | null;
+
+  confirmedAt?: string | null;
+  preparingAt?: string | null;
+  shippingAt?: string | null;
+  completedAt?: string | null;
+
+  cancelledBy?: CancelledBy | null;
+  cancelReason?: string;
+  cancelledAt?: string | null;
+
+  shippingFee: number;
+  discount: number;
+
+  totalPrice: number;
+  finalTotal: number;
+
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Province {
+  code: number
+  name: string
+  division_type: string
+  codename: string
+  phone_code: number
+}
+
+export interface Ward {
+  code: number
+  name: string
+  division_type: string
+  codename: string
+  district_code: number  
+}

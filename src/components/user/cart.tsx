@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { X, Minus, Plus, ChevronRight, Facebook, Instagram, ShoppingCart } from "lucide-react";
+import { X, Minus, Plus, ChevronRight, Facebook, Instagram, ShoppingCart, User, Bell } from "lucide-react";
 import { toast } from "sonner";
 import {Skeleton} from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 import { getCart, updateCartItem, removeCartItem } from "@/lib/api/cart";
 import { CartItem } from "@/lib/api/types";
@@ -14,6 +16,7 @@ import { CartItem } from "@/lib/api/types";
 export function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openSupport, setOpenSupport] = useState(false);
 
   useEffect(() => {
     loadCart();
@@ -70,6 +73,92 @@ export function CartPage() {
 
   return (
     <>
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
+          <div></div>
+          <div className="flex items-center gap-6">
+            <button className="text-gray-700 text-2xl">
+              <Bell className="w-6 h-6 text-gray-700" />
+            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 border border-red-500 text-red-600 rounded-full px-4 py-1  ">
+                <span className="text-xl">☰</span>
+                <User className="w-6 h-6 text-red-600" />
+              </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/auth/login"
+                      className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                    >
+                      Đăng nhập
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/auth/register"
+                      className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                    >
+                      Đăng ký
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/dashboard/user/order/listorder"
+                      className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                    >
+                      Theo dõi đơn hàng
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => setOpenSupport(true)}
+                    className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none cursor-pointer transition-all duration-200"
+                  >
+                    Hỗ trợ khách hàng
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+      <Dialog open={openSupport} onOpenChange={setOpenSupport}>
+        <DialogContent className="max-w-sm rounded-2xl p-2">
+          <div className="text-center -mt-2">
+            <DialogTitle className="text-lg font-bold leading-tight">
+              Hỗ trợ khách hàng
+            </DialogTitle>
+            <div className="w-12 h-1 bg-red-600 rounded-full mx-auto mt-2" />
+          </div>
+
+        <p className="text-center text-gray-700 text-base mt-6 leading-relaxed">
+          Bạn có muốn gọi đến <strong>1900 1822 </strong>không?
+        </p>
+
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            <button
+              type="button"
+              onClick={() => setOpenSupport(false)}
+              className="w-full py-3.5 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              Hủy
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = "tel:19001822";
+              }}
+              className="w-full py-3.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors shadow-md"
+            >
+              Gọi ngay
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      </header>
+
     <main className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-10">Giỏ hàng của tôi</h1>
 
@@ -96,7 +185,6 @@ export function CartPage() {
                     key={item.product._id}
                     className="flex items-center justify-between gap-4 p-4 bg-white rounded-xl shadow-sm border hover:shadow transition"
                   >
-                    {/* Ảnh */}
                     <Image
                       src={item.product.image || "/placeholder.jpg"}
                       width={70}
@@ -188,10 +276,12 @@ export function CartPage() {
                   </span>
                 </div>
               </div>
-
-              <button className="w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-bold text-lg py-4 rounded-xl transition shadow-lg">
+              <Link
+                href="./order"
+                className="w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-bold text-lg py-4 rounded-xl transition shadow-lg text-center block"
+              >
                 Thanh toán ngay
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -220,15 +310,13 @@ export function CartPage() {
           <span className="hidden md:inline text-gray-600">|</span>
 
           <Link
-            href="#" 
+            href="" 
             className="hover:text-red-400 transition hidden md:inline"
           >
             Chính sách bảo mật
           </Link>
 
           <span className="hidden md:inline text-gray-600">|</span>
-
-          {/* Icon mạng xã hội */}
           <div className="flex items-center gap-4">
             <Facebook className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />
             <Instagram className="w-5 h-5 hover:text-red-400 cursor-pointer transition" />

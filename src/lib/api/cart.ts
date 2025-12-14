@@ -131,30 +131,3 @@ export async function removeCartItem(
 }
 
 
-export async function clearCart(): Promise<ApiResponse<{ cart: Cart }>> {
-  const accessToken = Cookies.get("access_token")
-
-  const res = await fetch(`${API_BASE}/api/cart`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    return {
-      success: false,
-      message: data.message || "Xoá giỏ hàng thất bại",
-    }
-  }
-
-  return {
-    success: true,
-    message: data.message || "Xoá giỏ hàng thành công",
-    data: {
-      cart: data.cart || data.data?.cart,
-    },
-  }
-}
