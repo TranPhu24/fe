@@ -204,3 +204,36 @@ export async function updateOrderStatus(
     },
   };
 }
+
+
+export async function createVNPayPayment(
+  orderId: string
+): Promise<ApiResponse<{ paymentUrl: string }>> {
+  const accessToken = Cookies.get("access_token");
+
+  const res = await fetch(`${API_BASE}/api/payment/vnpay/create`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ orderId }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      success: false,
+      message: data.message || "Không thể tạo thanh toán VNPay",
+    };
+  }
+
+  return {
+    success: true,
+    message: "Tạo URL VNPay thành công",
+    data: {
+      paymentUrl: data.paymentUrl,
+    },
+  };
+}

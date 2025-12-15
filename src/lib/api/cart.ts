@@ -7,7 +7,6 @@ export async function addToCart(
   quantity = 1
 ): Promise<ApiResponse<{ cart: Cart }>> {
   const accessToken = Cookies.get("access_token")
-
   const res = await fetch(`${API_BASE}/api/cart`, {
     method: "POST",
     headers: {
@@ -48,17 +47,16 @@ export async function getCart(): Promise<ApiResponse<{ cart: Cart | null }>> {
   })
 
   const data = await res.json()
-
   if (!res.ok) {
     return {
       success: false,
-      message: data.message || "Không thể lấy giỏ hàng",
+      message: data.message||"Không thể lấy giỏ hàng",
     }
   }
 
   return {
     success: true,
-    message: data.message || "Lấy giỏ hàng thành công",
+    message: data.message||"Lấy giỏ hàng thành công",
     data: {
       cart: data.cart ?? data.data?.cart ?? null,
     },
@@ -86,15 +84,15 @@ export async function updateCartItem(
   if (!res.ok) {
     return {
       success: false,
-      message: data.message || "Cập nhật giỏ hàng thất bại",
+      message: data.message||"Cập nhật giỏ hàng thất bại",
     }
   }
 
   return {
     success: true,
-    message: data.message || "Cập nhật giỏ hàng thành công",
+    message: data.message||"Cập nhật giỏ hàng thành công",
     data: {
-      cart: data.cart || data.data?.cart,
+      cart: data.cart||data.data?.cart,
     },
   }
 }
@@ -117,15 +115,15 @@ export async function removeCartItem(
   if (!res.ok) {
     return {
       success: false,
-      message: data.message || "Xoá sản phẩm khỏi giỏ thất bại",
+      message: data.message|| "Xoá sản phẩm khỏi giỏ thất bại",
     }
   }
 
   return {
     success: true,
-    message: data.message || "Xoá sản phẩm khỏi giỏ thành công",
+    message: data.message|| "Xoá sản phẩm khỏi giỏ thành công",
     data: {
-      cart: data.cart || data.data?.cart,
+      cart: data.cart|| data.data?.cart,
     },
   }
 }

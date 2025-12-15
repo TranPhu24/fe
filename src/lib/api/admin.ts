@@ -12,7 +12,7 @@ export async function createEmployee(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,  // ⬅️ QUAN TRỌNG
+      Authorization: `Bearer ${accessToken}`,  
     },
     credentials: "include",
     body: JSON.stringify(dto),
@@ -43,7 +43,7 @@ export async function getAllEmployees(): Promise<
   const res = await fetch(`${API_BASE}/api/user/employees`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${accessToken}`,  // ⬅️ CẦN!
+      Authorization: `Bearer ${accessToken}`,  
     },
     credentials: "include",
   });

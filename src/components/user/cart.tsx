@@ -1,10 +1,10 @@
 "use client";
-
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { X, Minus, Plus, ChevronRight, Facebook, Instagram, ShoppingCart, User, Bell } from "lucide-react";
 import { toast } from "sonner";
-import {Skeleton} from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -17,7 +17,7 @@ export function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [openSupport, setOpenSupport] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     loadCart();
   }, []);
@@ -32,7 +32,7 @@ export function CartPage() {
         toast.error(res.message || "Không thể tải giỏ hàng");
         return;
         }
-
+        toast.success(res.message);
     setCartItems(res.data?.cart?.items || []);
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Lỗi tải giỏ hàng";
@@ -41,7 +41,6 @@ export function CartPage() {
         setLoading(false);
     }
     };
-
   const handleUpdateQuantity = async (productId: string, quantity: number) => {
     if (quantity < 1) return;
 
@@ -70,6 +69,11 @@ export function CartPage() {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
+  
+    const handleLogout = () => {
+      Cookies.remove("access_token")
+      router.push("/auth/login")
+    }
 
   return (
     <>
@@ -86,6 +90,14 @@ export function CartPage() {
                 <User className="w-6 h-6 text-red-600" />
               </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
+                                <DropdownMenuItem asChild>
+                  <Link
+                    href="/"
+                    className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                  >
+                    Trang chủ
+                  </Link>
+                </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link
                       href="/auth/login"
@@ -119,6 +131,12 @@ export function CartPage() {
                   >
                     Hỗ trợ khách hàng
                   </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-all duration-200 cursor-pointer"
+                  >
+                  Đăng xuất
+                </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -164,11 +182,8 @@ export function CartPage() {
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {[...Array(6)].map((_, idx) => (
-          <Skeleton key={idx} className="h-24 w-full rounded-xl" />
-        ))}
-        </div>
 
+        </div>
       ) : cartItems.length === 0 ? (
         <div className="text-center py-20 flex flex-col items-center justify-center gap-4">
             <ShoppingCart size={200} className="text-gray-400" />
@@ -176,7 +191,6 @@ export function CartPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-8 items-start">
-          
           <div className="w-full">
             <ScrollArea className="h-[calc(100vh-265px)] w-full rounded-xl border bg-gray-50/50"> 
               <div className="space-y-4 p-4">

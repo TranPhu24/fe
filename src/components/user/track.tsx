@@ -1,5 +1,5 @@
 "use client";
-
+import Cookies from "js-cookie";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getOrderById, cancelOrder } from "@/lib/api/order";
@@ -134,6 +134,10 @@ export function OrderDetailPage() {
     : getTimelineData(order.orderStatus);
 
   const icons = [FileText, CreditCard, Package, Truck, CheckCircle];
+        const handleLogout = () => {
+        Cookies.remove("access_token")
+        router.push("/auth/login")
+      }
 
   return (
     <>
@@ -150,6 +154,14 @@ export function OrderDetailPage() {
               <User className="w-6 h-6 text-red-600" />
             </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/"
+                    className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                  >
+                    Trang chủ
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
                     href="/auth/login"
@@ -182,6 +194,12 @@ export function OrderDetailPage() {
                   className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none cursor-pointer transition-all duration-200"
                 >
                   Hỗ trợ khách hàng
+                </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-all duration-200 cursor-pointer"
+                  >
+                  Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>
           </DropdownMenu>

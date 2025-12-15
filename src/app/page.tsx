@@ -1,5 +1,6 @@
 "use client";
-
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Facebook, Instagram, X, Minus, Plus,  Bell, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
@@ -52,7 +53,7 @@ export default function Home() {
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-
+  const router = useRouter();
 
   useEffect(() => {
     loadCategories();
@@ -207,6 +208,11 @@ export default function Home() {
 
   setFilteredProducts(filtered);
 }, [searchQuery, products]);
+
+  const handleLogout = () => {
+    Cookies.remove("access_token")
+    router.push("/auth/login")
+  }
   return (
   <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -263,6 +269,12 @@ export default function Home() {
                   className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none cursor-pointer transition-all duration-200"
                 >
                   Hỗ trợ khách hàng
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-all duration-200 cursor-pointer"
+                >
+                  Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>
           </DropdownMenu>
@@ -576,7 +588,7 @@ export default function Home() {
               >
                 <span>Thêm vào giỏ hàng</span>
                 <span className="font-bold">
-                  • {(selectedProduct?.price ? (selectedProduct.price * quantity) : 0).toLocaleString()}đ
+                  - {(selectedProduct?.price ? (selectedProduct.price * quantity) : 0).toLocaleString()}đ
                 </span>
               </button>
             </div>

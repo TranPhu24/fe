@@ -1,11 +1,13 @@
 "use client"
-
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react"
 import { getCart, } from "@/lib/api/cart"
-import { createOrder } from "@/lib/api/order"
+import { createOrder, createVNPayPayment } from "@/lib/api/order"
 import { getProvinces, getWardsByProvince } from "@/lib/api/location"
 import { useRouter } from "next/navigation"
 import { Cart, Province, Ward } from "@/lib/api/types"
+
+
 import { toast } from "sonner"
 import { Bell, User, Facebook, Instagram } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -111,35 +113,54 @@ export function CheckoutForm() {
     return <div className="text-center py-20 text-xl text-gray-600">Giỏ hàng trống</div>
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!form.fullName.trim()) return toast.error("Vui lòng nhập họ tên")
-    if (!form.phone.trim()) return toast.error("Vui lòng nhập số điện thoại")
-    if (!/^\d{9,11}$/.test(form.phone.replace(/\D/g, ""))) return toast.error("Số điện thoại không hợp lệ")
-    if (!form.city) return toast.error("Vui lòng chọn Tỉnh/Thành phố")
-    if (!form.ward) return toast.error("Vui lòng chọn Phường/Xã")
-    if (!form.address.trim()) return toast.error("Vui lòng nhập địa chỉ chi tiết")
+    if (!form.fullName.trim()) return toast.error("Vui lòng nhập họ tên");
+    if (!form.phone.trim()) return toast.error("Vui lòng nhập số điện thoại");
+    if (!/^\d{9,11}$/.test(form.phone.replace(/\D/g, "")))
+      return toast.error("Số điện thoại không hợp lệ");
+    if (!form.city) return toast.error("Vui lòng chọn Tỉnh/Thành phố");
+    if (!form.ward) return toast.error("Vui lòng chọn Phường/Xã");
+    if (!form.address.trim())
+      return toast.error("Vui lòng nhập địa chỉ chi tiết");
 
     const shippingAddress = {
       fullName: form.fullName.trim(),
       phone: form.phone.trim(),
       address: form.address.trim(),
-      city: form.cityName || form.city,      
-      ward: form.wardName || form.ward,      
+      city: form.cityName || form.city,
+      ward: form.wardName || form.ward,
       cityCode: form.city,
       wardCode: form.ward,
+    };
+
+    const res = await createOrder(
+      paymentMethod,
+      shippingAddress,
+      form.note.trim()
+    );
+
+    if (!res.success || !res.data) {
+      toast.error(res.message);
+      return;
     }
 
-    const res = await createOrder(paymentMethod, shippingAddress, form.note.trim())
+    const order = res.data.order;
+    if (paymentMethod === "VNPAY") {
+      const vnpayRes = await createVNPayPayment(order._id);
 
-    if (!res.success) {
-      toast.error(res.message)
-      return
+      if (!vnpayRes.success || !vnpayRes.data) {
+        toast.error(vnpayRes.message || "Không thể tạo thanh toán VNPay");
+        return;
+      }
+      window.location.href = vnpayRes.data.paymentUrl;
+      return;
     }
 
-    toast.success("Đặt hàng thành công!")
-    router.push(`/dashboard/user/order/${res.data.order._id}`)
-  }
+    toast.success("Đặt hàng thành công!");
+    router.push(`/dashboard/user/order/${order._id}`);
+  };
+
 
   const handleProvinceChange = (code: string, name: string) => {
     setForm(prev => ({ ...prev, city: code, cityName: name, ward: "", wardName: "" }))
@@ -148,6 +169,10 @@ export function CheckoutForm() {
   const handleWardChange = (code: string, name: string) => {
     setForm(prev => ({ ...prev, ward: code, wardName: name }))
   }
+      const handleLogout = () => {
+      Cookies.remove("access_token")
+      router.push("/auth/login")
+    }
 
   return (
     <>
@@ -164,6 +189,14 @@ export function CheckoutForm() {
               <User className="w-6 h-6 text-red-600" />
             </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
+                              <DropdownMenuItem asChild>
+                  <Link
+                    href="/"
+                    className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
+                  >
+                    Trang chủ
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
                     href="/auth/login"
@@ -196,6 +229,12 @@ export function CheckoutForm() {
                   className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none cursor-pointer transition-all duration-200"
                 >
                   Hỗ trợ khách hàng
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 focus:bg-red-50 focus:outline-none transition-all duration-200 cursor-pointer"
+                  >
+                  Đăng xuất
                 </DropdownMenuItem>
               </DropdownMenuContent>
           </DropdownMenu>

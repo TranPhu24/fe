@@ -142,7 +142,7 @@ export interface ShippingAddress {
 
 type PaymentMethod = "COD" | "VNPAY";
 
-type PaymentStatus =
+export type PaymentStatus =
   | "pending"
   | "paid"
   | "failed"
