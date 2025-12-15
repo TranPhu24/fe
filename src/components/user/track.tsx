@@ -10,12 +10,15 @@ import { Bell, User, Facebook, Instagram } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Link from "next/link";
+import Image from "next/image";
 export function OrderDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-    const [openSupport, setOpenSupport] = useState(false);
+  const [openSupport, setOpenSupport] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
     const loadOrder = useCallback(async () => {
     if (!id) return;
@@ -134,16 +137,33 @@ export function OrderDetailPage() {
     : getTimelineData(order.orderStatus);
 
   const icons = [FileText, CreditCard, Package, Truck, CheckCircle];
-        const handleLogout = () => {
-        Cookies.remove("access_token")
-        router.push("/auth/login")
-      }
 
+  const handleCancelOrder = async () => {
+    if (!cancelReason.trim()) {
+      toast.error("Vui lòng nhập lý do huỷ đơn");
+      return;
+    }
+    await cancelOrder(order._id, cancelReason);
+  };
+    const handleLogout = () => {
+    Cookies.remove("access_token")
+    router.push("/auth/login")}
   return (
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-        <div></div>
+              <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
+                Món nóng hổi - Giao tận nơi
+              </div>
+              <div className="flex items-center gap-6">
+              <Image
+                src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
+                alt="User Avatar"
+                width={60}
+                height={60}
+                className="rounded-full cursor-pointer"
+              />
+              </div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />
@@ -335,23 +355,65 @@ export function OrderDetailPage() {
         <p className="text-lg">Thanh toán: <b>{order.paymentMethod}</b></p>
         <p className="text-lg">Tổng cộng: <span className="text-red-600"><b>{order.finalTotal.toLocaleString()}đ</b></span></p>
       </div>
-
       {order.orderStatus === "pending" && (
         <button
-          onClick={async () => {
-            const res = await cancelOrder(order._id);
-            if (res.success) {
-              toast.success("Đã huỷ đơn hàng");
-              loadOrder();
-            } else {
-              toast.error(res.message);
-            }
-          }}
+          onClick={() => setOpenCancel(true)}
           className="w-full bg-gray-200 hover:bg-gray-300 rounded-xl py-3 font-semibold"
         >
           Huỷ đơn
         </button>
       )}
+      <Dialog open={openCancel} onOpenChange={setOpenCancel}>
+        <DialogContent className="max-w-sm rounded-2xl">
+          <DialogTitle className="text-lg font-bold">
+            Huỷ đơn hàng
+          </DialogTitle>
+
+          <p className="text-sm text-gray-600 mt-2">
+            Vui lòng nhập lý do huỷ đơn
+          </p>
+
+          <textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            className="w-full mt-4 border rounded-lg p-3 text-sm resize-none"
+            rows={3}
+            placeholder="Ví dụ: Đặt nhầm món, đổi ý..."
+          />
+
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => setOpenCancel(false)}
+              className="flex-1 py-2 border rounded-lg"
+            >
+              Đóng
+            </button>
+
+            <button
+              onClick={async () => {
+                if (!cancelReason.trim()) {
+                  toast.error("Vui lòng nhập lý do huỷ");
+                  return;
+                }
+
+                const res = await cancelOrder(order._id, cancelReason);
+
+                if (res.success) {
+                  toast.success("Đã huỷ đơn hàng");
+                  setOpenCancel(false);
+                  setCancelReason("");
+                  loadOrder();
+                } else {
+                  toast.error(res.message);
+                }
+              }}
+              className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Xác nhận huỷ
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <button
         onClick={() => router.push("/")}

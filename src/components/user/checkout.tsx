@@ -4,10 +4,10 @@ import { useState, useEffect } from "react"
 import { getCart, } from "@/lib/api/cart"
 import { createOrder, createVNPayPayment } from "@/lib/api/order"
 import { getProvinces, getWardsByProvince } from "@/lib/api/location"
+
 import { useRouter } from "next/navigation"
 import { Cart, Province, Ward } from "@/lib/api/types"
-
-
+import Image from "next/image";
 import { toast } from "sonner"
 import { Bell, User, Facebook, Instagram } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -178,7 +178,18 @@ export function CheckoutForm() {
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-        <div></div>
+        <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
+          Món nóng hổi - Giao tận nơi
+        </div>
+        <div className="flex items-center gap-6">
+        <Image
+          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
+          alt="User Avatar"
+          width={60}
+          height={60}
+          className="rounded-full cursor-pointer"
+        />
+        </div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />

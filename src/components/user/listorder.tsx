@@ -9,35 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Bell, User, Facebook, Instagram } from "lucide-react";
 import Link from "next/link";
-
-export  function OrderList() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(false);
-    const [openSupport, setOpenSupport] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const loadOrders = async () => {
-      try {
-        setLoading(true);
-
-        const res = await getMyOrders();
-
-        if (!res.success) {
-          toast.error(res.message || "Không tải được đơn hàng");
-          return;
-        }
-        setOrders(res.data?.orders || []);
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Lỗi tải đơn hàng";
-        toast.error(message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadOrders();
-  }, []);
+import Image from "next/image";
   const statusMap: Record<OrderStatus, { label: string; color: string }> = {
   pending: { 
     label: "Chờ xác nhận", 
@@ -83,6 +55,35 @@ export  function OrderList() {
     }
   };
 
+export  function OrderList() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [openSupport, setOpenSupport] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  const loadOrders = async () => {
+  try {
+    setLoading(true);
+
+    const res = await getMyOrders();
+
+    if (!res.success) {
+      toast.error(res.message || "Không tải được đơn hàng");
+      return;
+    }
+    setOrders(res.data?.orders || []);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Lỗi tải đơn hàng";
+    toast.error(message);
+  } finally {
+    setLoading(false);
+  }
+};
+
   if (loading) return <p className="text-center py-10">Đang tải đơn hàng...</p>;
   if (orders.length === 0) return <p className="text-center py-10">Bạn chưa có đơn hàng nào.</p>;
       const handleLogout = () => {
@@ -93,7 +94,18 @@ export  function OrderList() {
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-        <div></div>
+      <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
+        Món nóng hổi - Giao tận nơi
+      </div>
+      <div className="flex items-center gap-6">
+      <Image
+        src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
+        alt="User Avatar"
+        width={60}
+        height={60}
+        className="rounded-full cursor-pointer"
+      />
+      </div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />
@@ -194,55 +206,84 @@ export  function OrderList() {
 
     <main className="bg-white shadow-sm sticky top-0 z-50 flex-1 pb-24">
     <div className="max-w-3xl mx-auto space-y-6">
-      {orders.map(order => (
-        <div key={order._id} className="bg-white rounded-xl shadow p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-semibold text-lg">
-              Đơn hàng: <span className="text-red-500"> {order._id.slice(-6)}</span>
-            </h2>
-            <span className="text-sm text-gray-500">
-              {new Date(order.createdAt).toLocaleDateString()}
-            </span>
-          </div>
+      {orders.map((order) => (
+        <div
+          key={order._id}
+          className="bg-white rounded-xl shadow p-6 space-y-4"
+        >
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 space-y-1">
+          <p className="font-semibold">
+            Đơn hàng:{" "}
+            <span className="text-red-600">{order._id.slice(-6)}</span>
+          </p>
 
-          <div className="border-t border-b divide-y">
-            {order.items.map(item => (
-              <div
-                key={item.product}
-                className="flex justify-between items-center py-2"
-              >
-                <span>{item.name} × {item.quantity}</span>
-                <span className="font-medium">
-                  {(item.price * item.quantity).toLocaleString()}đ
-                </span>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-gray-500">
+            <b>Thời gian đặt:</b> {new Date(order.createdAt).toLocaleString()}
+          </p>
 
-          <div className="flex justify-between items-center mt-4">
-            <span className="font-semibold text-gray-800">
-              Tổng: {order.finalTotal.toLocaleString()}đ
-            </span>
-            <button
-              onClick={() => router.push(`/dashboard/user/order/${order._id}`)}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
-            >
-              Theo dõi đơn hàng
-            </button>
-          </div>
+          <p className="text-sm text-gray-500">
+            <b>Họ tên người nhận:</b> {order.shippingAddress.fullName}
+          </p>
 
-      <div className="mt-2 flex items-center gap-2 font-semibold">
-        <span
-          className={`px-2 py-1 rounded text-sm ${statusMap[order.orderStatus].color}`}>
-          {statusMap[order.orderStatus].label}
-        </span>
-        <span
-          className={`px-2 py-1 rounded text-sm ${paymentStatusMap[order.paymentStatus].color}`}>
-          {paymentStatusMap[order.paymentStatus].label}
-        </span>
-      </div>
+          <p className="text-sm text-gray-500">
+            <b>Số điện thoại:</b> {order.shippingAddress.phone}
+          </p>
+
+          <p className="text-sm text-gray-500">
+            <b>Địa chỉ nhận hàng:</b> {order.shippingAddress.address},{" "}
+            {order.shippingAddress.ward},{" "}
+            {order.shippingAddress.city}
+          </p>
         </div>
-      ))}
+
+        <div className="flex-shrink-0">
+          <button
+            onClick={() => router.push(`/dashboard/user/order/${order._id}`)}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
+          >
+            Theo dõi đơn hàng
+          </button>
+        </div>
+      </div>
+      <div className="border-t pt-3 space-y-2">
+        {order.items.map((item) => (
+          <div
+            key={item.product}
+            className="flex justify-between text-sm"
+          >
+            <span>
+              {item.name} × {item.quantity}
+            </span>
+            <span className="font-medium">
+              {(item.price * item.quantity).toLocaleString()}đ
+            </span>
+          </div>
+        ))}
+      </div>
+
+        <div className="flex justify-between items-center border-t pt-3 font-semibold">
+          <span
+            className={`px-2 py-1 rounded text-sm font-medium ${
+              statusMap[order.orderStatus].color
+            }`}
+          >
+            {statusMap[order.orderStatus].label}
+          </span>
+            <span className="font-semibold">
+                Tổng tiền: {order.finalTotal.toLocaleString()}đ
+            </span>
+        </div>
+        <div className="font-semibold">
+            <span
+            className={`px-2 py-1 rounded text-sm 
+            ${paymentStatusMap[order.paymentStatus].color}`}>
+            {paymentStatusMap[order.paymentStatus].label}
+            </span>
+        </div>
+      </div>
+    ))}
+
     </div>
     </main>
         <footer className="fixed bottom-0 left-0 right-0 h-20 bg-gray-900 text-gray-300 border-t border-gray-800 z-50">
@@ -275,7 +316,6 @@ export  function OrderList() {
             </div>
         </div>
     </footer>
-
     </>
   );
 }

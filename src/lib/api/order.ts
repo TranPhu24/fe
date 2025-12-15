@@ -103,19 +103,27 @@ export async function getOrderById(
   };
 }
 
-/**
- * Huỷ đơn hàng (user)
- */
+
 export async function cancelOrder(
-  id: string
+  id: string,
+  reason: string
 ): Promise<ApiResponse<{ order: Order }>> {
   const accessToken = Cookies.get("access_token");
+
+  if (!accessToken) {
+    return {
+      success: false,
+      message: "Chưa đăng nhập",
+    };
+  }
 
   const res = await fetch(`${API_BASE}/api/orders/${id}/cancel`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ reason }),
   });
 
   const data = await res.json();
@@ -135,6 +143,7 @@ export async function cancelOrder(
     },
   };
 }
+
 
 /**
  * ADMIN: lấy tất cả đơn hàng
