@@ -12,7 +12,6 @@ export async function createProduct(
 ): Promise<ApiResponse<{ product: Product }>> {
   const accessToken = Cookies.get("access_token")
 
-
   if (!dto.image || !(dto.image instanceof File)) {
     return { success: false, message: "Vui lòng chọn hình ảnh sản phẩm" }
   }

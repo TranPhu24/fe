@@ -79,17 +79,7 @@ export function CartPage() {
     <>
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-                  <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
-                    Món nóng hổi - Giao tận nơi
-                  </div>
-                  <div className="flex items-center gap-6">
-                  <Image
-                    src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
-                    alt="User Avatar"
-                    width={60}
-                    height={60}
-                    className="rounded-full cursor-pointer"
-                  />
+                  <div >
                   </div>
           <div className="flex items-center gap-6">
             <button className="text-gray-700 text-2xl">
@@ -200,6 +190,12 @@ export function CartPage() {
             <ShoppingCart size={200} className="text-gray-400" />
             <p className="text-3xl text-gray-600">Giỏ hàng trống</p>
             <p className="text-xl">Giỏ hàng của bạn trông hơi trống. Tại sao không thử một vài món của chúng tôi</p>
+              <Link
+                href="/"
+                className="inline-block mt-4 px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition shadow-md"
+                >
+                  Đi đặt món ngay
+              </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-8 items-start">

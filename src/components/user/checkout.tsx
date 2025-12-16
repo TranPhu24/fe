@@ -178,17 +178,7 @@ export function CheckoutForm() {
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-        <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
-          Món nóng hổi - Giao tận nơi
-        </div>
-        <div className="flex items-center gap-6">
-        <Image
-          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
-          alt="User Avatar"
-          width={60}
-          height={60}
-          className="rounded-full cursor-pointer"
-        />
+        <div >
         </div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">

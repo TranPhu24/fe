@@ -349,80 +349,84 @@ export default function Home() {
     </section>
 
     {/* Category */}
-    <nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center gap-8 lg:gap-12 py-6 overflow-x-auto scrollbar-hide">
-          <div className="flex-shrink-0">
-            <button
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="flex items-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-200 whitespace-nowrap"
-              aria-label="Mở/đóng tìm kiếm"
-            >
-              <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-          </div>
+<nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="flex items-center gap-8 lg:gap-12 py-6 overflow-x-auto scrollbar-hide">
+      {/* Nút search - cố định */}
+      <div className="flex-shrink-0">
+        <button
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+          className="flex items-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-200 whitespace-nowrap"
+          aria-label="Mở/đóng tìm kiếm"
+        >
+          <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </div>
 
-          <div className={`transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-w-2xl opacity-100' : 'max-w-0 opacity-0'} overflow-hidden`}>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Tìm kiếm món ăn..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-                className="w-full min-w-[300px] px-5 py-3 pl-12 pr-12 text-lg font-bold rounded-full border border-gray-300 focus:border-red-500 focus:outline-none shadow-md transition-all"
-              />
-            
-              {isSearchOpen && (
-                <button
-                  onClick={() => {
-                    if (searchQuery) {
-                      setSearchQuery(""); 
-                    } else {
-                      setIsSearchOpen(false); 
-                    }
-                  }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap flex-1">
-            {loadingCategories ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
-              ))
-            ) : (
-              categories.map((c) => (
-                <a
-                  key={c._id}
-                  href={`#${c.name}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
-                    ${activeCategory === c.name
-                      ? "text-red-600 border-red-600"
-                      : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
-                    }`}
-                >
-                  {c.name}
-                </a>
-              ))
-            )}
-          </div>
+      {/* Input search - ưu tiên không gian, không bị co */}
+      <div
+        className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
+          isSearchOpen ? 'w-full max-w-2xl opacity-100' : 'w-0 max-w-0 opacity-0'
+        } overflow-hidden`}
+      >
+        <div className="relative min-w-[300px] lg:min-w-[400px]">
+          <input
+            type="text"
+            placeholder="Tìm kiếm món ăn..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoFocus={isSearchOpen}
+            className="w-full px-5 py-3 pl-12 pr-12 text-lg font-bold rounded-full border border-gray-300 focus:border-red-500 focus:outline-none shadow-md transition-all"
+          />
+          
+          <button
+            onClick={() => {
+              if (searchQuery) {
+                setSearchQuery("");
+              } else {
+                setIsSearchOpen(false);
+              }
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
       </div>
-    </nav>
+
+      {/* Menu - chỉ chiếm phần còn lại, có thể cuộn ngang */}
+      <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0">
+        {loadingCategories ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
+          ))
+        ) : (
+          categories.map((c) => (
+            <a
+              key={c._id}
+              href={`#${c.name}`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
+                ${activeCategory === c.name
+                  ? "text-red-600 border-red-600"
+                  : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
+                }`}
+            >
+              {c.name}
+            </a>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
-
         {searchQuery.trim() !== "" ? (
           <section className="scroll-mt-32">
             <h2 className="text-2xl font-bold mb-6">

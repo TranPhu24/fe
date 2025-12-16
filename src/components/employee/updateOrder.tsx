@@ -69,8 +69,9 @@ export function EmployeeOrderPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [orderStatusFilter, setOrderStatusFilter] =useState<OrderStatus | "all">("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] =useState<PaymentStatus | "all">("all");
 
-  /* cancel dialog */
   const [openCancel, setOpenCancel] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -143,8 +144,66 @@ export function EmployeeOrderPage() {
         <h1 className="text-2xl font-bold">
           Cập nhật trạng thái đơn hàng
         </h1>
+        <div className="flex flex-wrap gap-4 items-center">
+        <select
+          value={orderStatusFilter}
+          onChange={(e) =>
+            setOrderStatusFilter(e.target.value as OrderStatus | "all")
+          }
+          className="border rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="all">Tất cả trạng thái đơn</option>
+          {Object.entries(statusMap).map(([key, value]) => (
+            <option key={key} value={key}>
+              {value.label}
+            </option>
+          ))}
+        </select>
 
-        {orders.map((order) => (
+        <select
+          value={paymentStatusFilter}
+          onChange={(e) =>
+            setPaymentStatusFilter(
+              e.target.value as PaymentStatus | "all"
+            )
+          }
+          className="border rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="all">Tất cả trạng thái thanh toán</option>
+          {Object.entries(paymentStatusMap).map(([key, value]) => (
+            <option key={key} value={key}>
+              {value.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p className="text-sm text-gray-500">
+        Hiển thị{" "}
+        <span className="text-red-600 font-bold">{
+          orders.filter((order) => {
+            const matchOrderStatus =
+              orderStatusFilter === "all" ||
+              order.orderStatus === orderStatusFilter;
+
+            const matchPaymentStatus =
+              paymentStatusFilter === "all" ||
+              order.paymentStatus === paymentStatusFilter;
+
+            return matchOrderStatus && matchPaymentStatus;
+          }).length
+        }{" "} </span>
+        đơn hàng
+      </p>
+       {orders.filter((order) => {
+          const matchOrderStatus =
+            orderStatusFilter === "all" ||
+            order.orderStatus === orderStatusFilter;
+          const matchPaymentStatus =
+            paymentStatusFilter === "all" ||
+            order.paymentStatus === paymentStatusFilter;
+
+          return matchOrderStatus && matchPaymentStatus;
+        }).map((order) => (
           <div
             key={order._id}
             className="bg-white rounded-xl shadow p-6 space-y-4"
@@ -243,7 +302,7 @@ export function EmployeeOrderPage() {
                 {statusMap[order.orderStatus].label}
               </span>
                 <span className="font-semibold">
-                    Tổng tiền: {order.finalTotal.toLocaleString()}đ
+                    Tổng tiền: <span className="text-red-600">{order.finalTotal.toLocaleString()}đ</span>
                 </span>
             </div>
             <div className="font-semibold">

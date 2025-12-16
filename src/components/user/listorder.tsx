@@ -7,9 +7,8 @@ import { getMyOrders } from "@/lib/api/order";
 import { Order, OrderStatus,PaymentStatus } from "@/lib/api/types";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Bell, User, Facebook, Instagram } from "lucide-react";
+import { Bell, User, Facebook, Instagram, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
   const statusMap: Record<OrderStatus, { label: string; color: string }> = {
   pending: { 
     label: "Chờ xác nhận", 
@@ -60,6 +59,8 @@ export  function OrderList() {
   const [loading, setLoading] = useState(false);
   const [openSupport, setOpenSupport] = useState(false);
   const router = useRouter();
+  const [orderStatusFilter, setOrderStatusFilter] =useState<OrderStatus | "all">("all");
+  const [paymentStatusFilter, setPaymentStatusFilter] =useState<PaymentStatus | "all">("all");
 
   useEffect(() => {
     loadOrders();
@@ -85,7 +86,6 @@ export  function OrderList() {
 };
 
   if (loading) return <p className="text-center py-10">Đang tải đơn hàng...</p>;
-  if (orders.length === 0) return <p className="text-center py-10">Bạn chưa có đơn hàng nào.</p>;
       const handleLogout = () => {
       Cookies.remove("access_token")
       router.push("/auth/login")
@@ -94,18 +94,7 @@ export  function OrderList() {
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-      <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
-        Món nóng hổi - Giao tận nơi
-      </div>
-      <div className="flex items-center gap-6">
-      <Image
-        src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
-        alt="User Avatar"
-        width={60}
-        height={60}
-        className="rounded-full cursor-pointer"
-      />
-      </div>
+        <div></div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />
@@ -202,90 +191,152 @@ export  function OrderList() {
       </DialogContent>
     </Dialog>
     </header>
-
-
-    <main className="bg-white shadow-sm sticky top-0 z-50 flex-1 pb-24">
-    <div className="max-w-3xl mx-auto space-y-6">
-      {orders.map((order) => (
-        <div
-          key={order._id}
-          className="bg-white rounded-xl shadow p-6 space-y-4"
-        >
-      <div className="flex justify-between items-start gap-4">
-        <div className="flex-1 space-y-1">
-          <p className="font-semibold">
-            Đơn hàng:{" "}
-            <span className="text-red-600">{order._id.slice(-6)}</span>
-          </p>
-
-          <p className="text-sm text-gray-500">
-            <b>Thời gian đặt:</b> {new Date(order.createdAt).toLocaleString()}
-          </p>
-
-          <p className="text-sm text-gray-500">
-            <b>Họ tên người nhận:</b> {order.shippingAddress.fullName}
-          </p>
-
-          <p className="text-sm text-gray-500">
-            <b>Số điện thoại:</b> {order.shippingAddress.phone}
-          </p>
-
-          <p className="text-sm text-gray-500">
-            <b>Địa chỉ nhận hàng:</b> {order.shippingAddress.address},{" "}
-            {order.shippingAddress.ward},{" "}
-            {order.shippingAddress.city}
-          </p>
-        </div>
-
-        <div className="flex-shrink-0">
-          <button
-            onClick={() => router.push(`/dashboard/user/order/${order._id}`)}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all"
-          >
-            Theo dõi đơn hàng
-          </button>
-        </div>
-      </div>
-      <div className="border-t pt-3 space-y-2">
-        {order.items.map((item) => (
-          <div
-            key={item.product}
-            className="flex justify-between text-sm"
-          >
-            <span>
-              {item.name} × {item.quantity}
-            </span>
-            <span className="font-medium">
-              {(item.price * item.quantity).toLocaleString()}đ
-            </span>
+      <main className="flex-1 pb-24 bg-gray-50"> 
+        <div className="max-w-3xl mx-auto px-4 py-8"> 
+                  <div className="flex flex-wrap gap-4 items-center">
+                  <select
+                    value={orderStatusFilter}
+                    onChange={(e) =>
+                      setOrderStatusFilter(e.target.value as OrderStatus | "all")
+                    }
+                    className="border rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="all">Tất cả trạng thái đơn</option>
+                    {Object.entries(statusMap).map(([key, value]) => (
+                      <option key={key} value={key}>
+                        {value.label}
+                      </option>
+                    ))}
+                  </select>
+          
+                  <select
+                    value={paymentStatusFilter}
+                    onChange={(e) =>
+                      setPaymentStatusFilter(
+                        e.target.value as PaymentStatus | "all"
+                      )
+                    }
+                    className="border rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="all">Tất cả trạng thái thanh toán</option>
+                    {Object.entries(paymentStatusMap).map(([key, value]) => (
+                      <option key={key} value={key}>
+                        {value.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <p className="text-sm text-gray-500 my-4">
+                  Hiển thị{" "}
+                  <span className="text-red-600 font-bold">{
+                    orders.filter((order) => {
+                      const matchOrderStatus =
+                        orderStatusFilter === "all" ||
+                        order.orderStatus === orderStatusFilter;
+          
+                      const matchPaymentStatus =
+                        paymentStatusFilter === "all" ||
+                        order.paymentStatus === paymentStatusFilter;
+          
+                      return matchOrderStatus && matchPaymentStatus;
+                    }).length
+                  }{" "} </span>
+                  đơn hàng
+                </p>
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-flex items-center gap-3 text-gray-600">
+                <div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-lg font-medium">Đang tải đơn hàng...</p>
+              </div>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="text-center py-20 flex flex-col items-center justify-center gap-4">
+            <ShoppingCart size={200} className="text-gray-400" />
+            <p className="text-3xl text-gray-600">Đơn hàng trống</p>
+            <p className="text-xl">Bạn chưa đặt đơn hàng nào. Tại sao không thử vài món của chúng tôi</p>
+            <Link
+                href="/"
+                className="inline-block mt-4 px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition shadow-md"
+                >
+                  Đi đặt món ngay
+              </Link>
           </div>
-        ))}
-      </div>
+          ) : (
+            <div className="space-y-6">
+              {orders.filter((order) => {
+                const matchOrderStatus =
+                  orderStatusFilter === "all" ||
+                  order.orderStatus === orderStatusFilter;
+                const matchPaymentStatus =
+                  paymentStatusFilter === "all" ||
+                  order.paymentStatus === paymentStatusFilter;
 
-        <div className="flex justify-between items-center border-t pt-3 font-semibold">
-          <span
-            className={`px-2 py-1 rounded text-sm font-medium ${
-              statusMap[order.orderStatus].color
-            }`}
-          >
-            {statusMap[order.orderStatus].label}
-          </span>
-            <span className="font-semibold">
-                Tổng tiền: {order.finalTotal.toLocaleString()}đ
-            </span>
-        </div>
-        <div className="font-semibold">
-            <span
-            className={`px-2 py-1 rounded text-sm 
-            ${paymentStatusMap[order.paymentStatus].color}`}>
-            {paymentStatusMap[order.paymentStatus].label}
-            </span>
-        </div>
-      </div>
-    ))}
+                return matchOrderStatus && matchPaymentStatus;
+              }).map((order) => (
+                <div
+                  key={order._id}
+                  className="bg-white rounded-2xl shadow-lg p-6 space-y-5 border border-gray-100 hover:shadow-xl transition-shadow"
+                >
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1 space-y-2">
+                      <p className="font-bold text-lg">
+                        Đơn hàng: <span className="text-red-600 font-extrabold">{order._id.slice(-8).toUpperCase()}</span>
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Thời gian đặt:</span> {new Date(order.createdAt).toLocaleString("vi-VN")}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Người nhận:</span> {order.shippingAddress.fullName} • {order.shippingAddress.phone}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">Địa chỉ:</span> {order.shippingAddress.address}, {order.shippingAddress.ward}, {order.shippingAddress.city}
+                      </p>
+                    </div>
 
-    </div>
-    </main>
+                    <button
+                      onClick={() => router.push(`/dashboard/user/order/${order._id}`)}
+                      className="px-5 py-2.5 bg-red-50 text-red-600 font-medium rounded-xl hover:bg-red-100 transition whitespace-nowrap"
+                    >
+                      Theo dõi đơn
+                    </button>
+                  </div>
+
+                  <div className="border-t pt-4 space-y-3">
+                    {order.items.map((item) => (
+                      <div key={item.product} className="flex justify-between text-gray-700">
+                        <span className="text-sm md:text-base">
+                          {item.name} <span className="text-gray-500">× {item.quantity}</span>
+                        </span>
+                        <span className="font-medium">
+                          {(item.price * item.quantity).toLocaleString()}đ
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap justify-between items-center gap-4 border-t pt-4">
+                    <div className="flex flex-wrap gap-3">
+                      <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${statusMap[order.orderStatus].color}`}>
+                        {statusMap[order.orderStatus].label}
+                      </span>
+                      <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${paymentStatusMap[order.paymentStatus].color}`}>
+                        {paymentStatusMap[order.paymentStatus].label}
+                      </span>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Tổng tiền</p>
+                      <p className="text-2xl font-bold text-red-600">
+                        {order.finalTotal.toLocaleString()}đ
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
         <footer className="fixed bottom-0 left-0 right-0 h-20 bg-gray-900 text-gray-300 border-t border-gray-800 z-50">
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
             <p className="text-sm hidden sm:block">
