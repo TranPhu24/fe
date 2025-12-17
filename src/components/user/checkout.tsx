@@ -7,11 +7,21 @@ import { getProvinces, getWardsByProvince } from "@/lib/api/location"
 
 import { useRouter } from "next/navigation"
 import { Cart, Province, Ward } from "@/lib/api/types"
-import Image from "next/image";
 import { toast } from "sonner"
 import { Bell, User, Facebook, Instagram } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import Link from "next/link";
 export function CheckoutForm() {
   const router = useRouter()
@@ -332,43 +342,63 @@ export function CheckoutForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
               <label className="block font-medium mb-1">Tỉnh/Thành phố <span className="text-red-600">*</span></label>
-              <select
-                required
-                className="w-full border rounded-lg px-4 py-2"
-                value={form.city}
-                onChange={(e) => {
-                  const selected = provinces.find(p => p.code === parseInt(e.target.value))
-                  if (selected) handleProvinceChange(e.target.value, selected.name)
-                }}
-              >
-                <option value="">Chọn tỉnh/thành</option>
-                {provinces.map((prov) => (
-                  <option key={prov.code} value={prov.code}>
-                    {prov.name}
-                  </option>
-                ))}
-              </select>
+                <Select
+                  value={form.city || ""}
+                  onValueChange={(value) => {
+                    const selected = provinces.find(
+                      (p) => p.code === parseInt(value)
+                    );
+                    if (selected) {
+                      handleProvinceChange(value, selected.name);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn tỉnh/thành" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {provinces.map((prov) => (
+                      <SelectItem
+                        key={prov.code}
+                        value={prov.code.toString()}
+                      >
+                        {prov.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
             </div>
 
             <div>
               <label className="block font-medium mb-1">Phường/Xã <span className="text-red-600">*</span></label>
-              <select
-                required
-                disabled={!form.city || loadingLocation}
-                className="w-full border rounded-lg px-4 py-2 disabled:bg-gray-100"
-                value={form.ward}
-                onChange={(e) => {
-                  const selected = wards.find(w => w.code === parseInt(e.target.value))
-                  if (selected) handleWardChange(e.target.value, selected.name)
-                }}
-              >
-                <option value="">Chọn phường/xã</option>
-                {wards.map((ward) => (
-                  <option key={ward.code} value={ward.code}>
-                    {ward.name}
-                  </option>
-                ))}
-              </select>
+                <Select
+                  value={form.ward || ""}
+                  disabled={!form.city || loadingLocation}
+                  onValueChange={(value) => {
+                    const selected = wards.find(
+                      (w) => w.code === parseInt(value)
+                    );
+                    if (selected) {
+                      handleWardChange(value, selected.name);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn phường/xã" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {wards.map((ward) => (
+                      <SelectItem
+                        key={ward.code}
+                        value={ward.code.toString()}
+                      >
+                        {ward.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
             </div>
           </div>
 
@@ -400,14 +430,20 @@ export function CheckoutForm() {
 
         <div className="bg-white border rounded-xl p-6 shadow-sm">
           <h3 className="font-semibold text-lg mb-4">Phương thức thanh toán</h3>
-          <select
-            className="w-full border rounded-lg px-4 py-3 text-base"
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value as "COD" | "VNPAY")}
-          >
-            <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-            <option value="VNPAY">Thanh toán qua VNPay</option>
-          </select>
+            <Select
+              value={paymentMethod}
+              onValueChange={(value) =>
+                setPaymentMethod(value as "COD" | "VNPAY")
+              }
+            >
+              <SelectTrigger className="w-full px-4 py-3 text-base">
+                <SelectValue placeholder="Chọn phương thức thanh toán" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="COD">Thanh toán khi nhận hàng (COD)</SelectItem>
+                <SelectItem value="VNPAY">Thanh toán qua VNPay</SelectItem>
+              </SelectContent>
+            </Select>
         </div>
 
         <button

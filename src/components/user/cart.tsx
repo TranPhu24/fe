@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 import { getCart, updateCartItem, removeCartItem } from "@/lib/api/cart";
 import { CartItem } from "@/lib/api/types";

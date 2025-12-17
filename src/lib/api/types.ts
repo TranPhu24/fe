@@ -207,3 +207,16 @@ export interface Ward {
   codename: string
   district_code: number  
 }
+
+export type RevenueType = "day" | "week" | "month";
+
+export type RawRevenueItem = {
+  _id: {
+    year: number;
+    month?: number;
+    day?: number;
+    week?: number;
+  };
+  totalRevenue: number;
+  totalOrders: number;
+};

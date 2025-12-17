@@ -37,9 +37,7 @@ export async function createOrder(
   };
 }
 
-/**
- * Lấy tất cả đơn hàng của chính user
- */
+
 export async function getMyOrders(): Promise<
   ApiResponse<{ orders: Order[] }>
 > {
@@ -70,9 +68,7 @@ export async function getMyOrders(): Promise<
   };
 }
 
-/**
- * Lấy chi tiết 1 đơn hàng
- */
+
 export async function getOrderById(
   id: string
 ): Promise<ApiResponse<{ order: Order }>> {
@@ -144,10 +140,6 @@ export async function cancelOrder(
   };
 }
 
-
-/**
- * ADMIN: lấy tất cả đơn hàng
- */
 export async function getAllOrders(): Promise<
   ApiResponse<{ orders: Order[] }>
 > {
@@ -178,9 +170,7 @@ export async function getAllOrders(): Promise<
   };
 }
 
-/**
- * ADMIN: cập nhật trạng thái đơn
- */
+
 export async function updateOrderStatus(
   id: string,
   status: string

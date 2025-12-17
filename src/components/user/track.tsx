@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import Cookies from "js-cookie";
 import { useEffect, useState, useCallback } from "react";
@@ -7,10 +8,13 @@ import { toast } from "sonner";
 import { Truck, Package, CreditCard, CheckCircle, FileText } from "lucide-react";
 import { Order, OrderItem } from "@/lib/api/types";
 import { Bell, User, Facebook, Instagram } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Link from "next/link";
-import Image from "next/image";
 export function OrderDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -143,8 +147,23 @@ export function OrderDetailPage() {
       toast.error("Vui lòng nhập lý do huỷ đơn");
       return;
     }
-    await cancelOrder(order._id, cancelReason);
+
+    try {
+      const res = await cancelOrder(order._id, cancelReason);
+
+      if (res.success) {
+        toast.success("Đã huỷ đơn hàng");
+        setOpenCancel(false);
+        setCancelReason("");
+        loadOrder();
+      } else {
+        toast.error(res.message || "Huỷ đơn thất bại");
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại");
+    }
   };
+
     const handleLogout = () => {
     Cookies.remove("access_token")
     router.push("/auth/login")}
@@ -379,28 +398,13 @@ export function OrderDetailPage() {
               Đóng
             </button>
 
-            <button
-              onClick={async () => {
-                if (!cancelReason.trim()) {
-                  toast.error("Vui lòng nhập lý do huỷ");
-                  return;
-                }
+          <button
+            onClick={handleCancelOrder}
+            className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Xác nhận huỷ
+          </button>
 
-                const res = await cancelOrder(order._id, cancelReason);
-
-                if (res.success) {
-                  toast.success("Đã huỷ đơn hàng");
-                  setOpenCancel(false);
-                  setCancelReason("");
-                  loadOrder();
-                } else {
-                  toast.error(res.message);
-                }
-              }}
-              className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-            >
-              Xác nhận huỷ
-            </button>
           </div>
         </DialogContent>
       </Dialog>

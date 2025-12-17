@@ -29,7 +29,7 @@ export function handleLogin(
 
   switch (role) {
     case "admin":
-      router.push("/dashboard/admin");
+      router.push("/dashboard/admin/report");
       break;
     case "employee":
       router.push("/dashboard/employee");

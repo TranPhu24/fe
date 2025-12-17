@@ -1,5 +1,4 @@
 "use client"
-
 import {
   Home,
   Users,
@@ -7,10 +6,10 @@ import {
   Settings,
   LogOut,
   ChevronUp,
-  ChevronDown,   // thêm để hiển thị mũi tên khi mở/đóng
-  FolderOpen,
+  ChevronDown,  
   Tag,
   Boxes,
+  FileText
 } from "lucide-react"
 
 import {
@@ -45,7 +44,7 @@ import { useState } from "react"
 const menuItems = [
   {
     title: "Trang chủ",
-    url: "/dashboard/admin",
+    url: "/dashboard/admin/report",
     icon: Home,
   },
   {
@@ -53,6 +52,12 @@ const menuItems = [
     url: "/dashboard/admin/account",
     icon: Users,
   },
+    {
+    title: "Quản lý đơn hàng",
+    url: "/dashboard/admin/order",
+    icon: FileText,
+  },
+
   {
     title: "Quản lý sản phẩm",      
     icon: Package,

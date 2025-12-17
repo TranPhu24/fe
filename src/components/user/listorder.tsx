@@ -5,9 +5,20 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner"
 import { getMyOrders } from "@/lib/api/order"; 
 import { Order, OrderStatus,PaymentStatus } from "@/lib/api/types";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Bell, User, Facebook, Instagram, ShoppingCart } from "lucide-react";
+import { Bell, User, Facebook, Instagram, FileText } from "lucide-react";
 import Link from "next/link";
   const statusMap: Record<OrderStatus, { label: string; color: string }> = {
   pending: { 
@@ -193,56 +204,70 @@ export  function OrderList() {
     </header>
       <main className="flex-1 pb-24 bg-gray-50"> 
         <div className="max-w-3xl mx-auto px-4 py-8"> 
-                  <div className="flex flex-wrap gap-4 items-center">
-                  <select
-                    value={orderStatusFilter}
-                    onChange={(e) =>
-                      setOrderStatusFilter(e.target.value as OrderStatus | "all")
-                    }
-                    className="border rounded-lg px-3 py-2 text-sm"
-                  >
-                    <option value="all">Tất cả trạng thái đơn</option>
-                    {Object.entries(statusMap).map(([key, value]) => (
-                      <option key={key} value={key}>
-                        {value.label}
-                      </option>
-                    ))}
-                  </select>
-          
-                  <select
-                    value={paymentStatusFilter}
-                    onChange={(e) =>
-                      setPaymentStatusFilter(
-                        e.target.value as PaymentStatus | "all"
-                      )
-                    }
-                    className="border rounded-lg px-3 py-2 text-sm"
-                  >
-                    <option value="all">Tất cả trạng thái thanh toán</option>
-                    {Object.entries(paymentStatusMap).map(([key, value]) => (
-                      <option key={key} value={key}>
-                        {value.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <p className="text-sm text-gray-500 my-4">
-                  Hiển thị{" "}
-                  <span className="text-red-600 font-bold">{
-                    orders.filter((order) => {
-                      const matchOrderStatus =
-                        orderStatusFilter === "all" ||
-                        order.orderStatus === orderStatusFilter;
-          
-                      const matchPaymentStatus =
-                        paymentStatusFilter === "all" ||
-                        order.paymentStatus === paymentStatusFilter;
-          
-                      return matchOrderStatus && matchPaymentStatus;
-                    }).length
-                  }{" "} </span>
-                  đơn hàng
-                </p>
+          <div className="flex flex-wrap gap-4 items-center">
+            <Select
+              value={orderStatusFilter}
+              onValueChange={(value) =>
+                setOrderStatusFilter(value as OrderStatus | "all")
+              }
+            >
+              <SelectTrigger className="border rounded-lg px-3 py-2 text-sm w-56">
+                <SelectValue placeholder="Tất cả trạng thái đơn" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">
+                  Tất cả trạng thái đơn
+                </SelectItem>
+
+                {Object.entries(statusMap).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={paymentStatusFilter}
+              onValueChange={(value) =>
+                setPaymentStatusFilter(value as PaymentStatus | "all")
+              }
+            >
+              <SelectTrigger className="border rounded-lg px-3 py-2 text-sm w-60">
+                <SelectValue placeholder="Tất cả trạng thái thanh toán" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">
+                  Tất cả trạng thái thanh toán
+                </SelectItem>
+
+                {Object.entries(paymentStatusMap).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+            <p className="text-sm text-gray-500 my-4">
+              Hiển thị{" "}
+              <span className="text-red-600 font-bold">{
+                orders.filter((order) => {
+                  const matchOrderStatus =
+                    orderStatusFilter === "all" ||
+                    order.orderStatus === orderStatusFilter;
+      
+                  const matchPaymentStatus =
+                    paymentStatusFilter === "all" ||
+                    order.paymentStatus === paymentStatusFilter;
+      
+                  return matchOrderStatus && matchPaymentStatus;
+                }).length
+              }{" "} </span>
+              đơn hàng
+            </p>
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3 text-gray-600">
@@ -252,7 +277,7 @@ export  function OrderList() {
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-20 flex flex-col items-center justify-center gap-4">
-            <ShoppingCart size={200} className="text-gray-400" />
+            <FileText size={200} className="text-gray-400" />
             <p className="text-3xl text-gray-600">Đơn hàng trống</p>
             <p className="text-xl">Bạn chưa đặt đơn hàng nào. Tại sao không thử vài món của chúng tôi</p>
             <Link
@@ -281,13 +306,16 @@ export  function OrderList() {
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex-1 space-y-2">
                       <p className="font-bold text-lg">
-                        Đơn hàng: <span className="text-red-600 font-extrabold">{order._id.slice(-8).toUpperCase()}</span>
+                        Đơn hàng: <span className="text-red-600 font-extrabold">{order._id.slice(-6)}</span>
                       </p>
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">Thời gian đặt:</span> {new Date(order.createdAt).toLocaleString("vi-VN")}
                       </p>
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">Người nhận:</span> {order.shippingAddress.fullName} • {order.shippingAddress.phone}
+                        <span className="font-medium">Người nhận:</span> {order.shippingAddress.fullName} 
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium"> Số điện thoại:</span> {order.shippingAddress.phone}
                       </p>
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">Địa chỉ:</span> {order.shippingAddress.address}, {order.shippingAddress.ward}, {order.shippingAddress.city}
