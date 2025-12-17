@@ -101,6 +101,17 @@ export  function OrderList() {
       Cookies.remove("access_token")
       router.push("/auth/login")
     }
+
+        const filteredOrders = orders.filter((order) => {
+        const matchOrderStatus =
+        orderStatusFilter === "all" ||
+        order.orderStatus === orderStatusFilter;
+
+    const matchPaymentStatus =
+        paymentStatusFilter === "all" ||
+        order.paymentStatus === paymentStatusFilter;
+    return matchOrderStatus && matchPaymentStatus 
+});
   return (
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -251,23 +262,12 @@ export  function OrderList() {
               </SelectContent>
             </Select>
           </div>
-            <p className="text-sm text-gray-500 my-4">
-              Hiển thị{" "}
-              <span className="text-red-600 font-bold">{
-                orders.filter((order) => {
-                  const matchOrderStatus =
-                    orderStatusFilter === "all" ||
-                    order.orderStatus === orderStatusFilter;
-      
-                  const matchPaymentStatus =
-                    paymentStatusFilter === "all" ||
-                    order.paymentStatus === paymentStatusFilter;
-      
-                  return matchOrderStatus && matchPaymentStatus;
-                }).length
-              }{" "} </span>
-              đơn hàng
-            </p>
+      <p className="text-sm text-gray-500 my-4">
+        Hiển thị{" "}
+        <span className="text-red-600 font-bold">
+            {filteredOrders.length}{" "} </span>
+        đơn hàng
+      </p>
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-3 text-gray-600">

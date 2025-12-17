@@ -72,6 +72,7 @@ export function EmployeeOrderPage() {
   const [loading, setLoading] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] =useState<OrderStatus | "all">("all");
   const [paymentStatusFilter, setPaymentStatusFilter] =useState<PaymentStatus | "all">("all");
+  const [dateFilter, setDateFilter] = useState<string>(""); 
 
     useEffect(() => {
         loadOrders();
@@ -94,6 +95,21 @@ export function EmployeeOrderPage() {
     }
     };
 
+    const filteredOrders = orders.filter((order) => {
+        const matchOrderStatus =
+        orderStatusFilter === "all" ||
+        order.orderStatus === orderStatusFilter;
+
+    const matchPaymentStatus =
+        paymentStatusFilter === "all" ||
+        order.paymentStatus === paymentStatusFilter;
+
+    const matchDate =
+        !dateFilter ||
+        new Date(order.createdAt).toISOString().slice(0, 10) === dateFilter;
+
+    return matchOrderStatus && matchPaymentStatus && matchDate;
+});
 
   if (loading) {
     return <p className="text-center py-10">Đang tải đơn hàng...</p>;
@@ -163,34 +179,20 @@ export function EmployeeOrderPage() {
                 ))}
               </SelectContent>
             </Select>
+            <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm"
+                />
       </div>
       <p className="text-sm text-gray-500 my-4">
         Hiển thị{" "}
-        <span className="text-red-600 font-bold">{
-          orders.filter((order) => {
-            const matchOrderStatus =
-              orderStatusFilter === "all" ||
-              order.orderStatus === orderStatusFilter;
-
-            const matchPaymentStatus =
-              paymentStatusFilter === "all" ||
-              order.paymentStatus === paymentStatusFilter;
-
-            return matchOrderStatus && matchPaymentStatus;
-          }).length
-        }{" "} </span>
+        <span className="text-red-600 font-bold">
+            {filteredOrders.length}{" "} </span>
         đơn hàng
       </p>
-       {orders.filter((order) => {
-          const matchOrderStatus =
-            orderStatusFilter === "all" ||
-            order.orderStatus === orderStatusFilter;
-          const matchPaymentStatus =
-            paymentStatusFilter === "all" ||
-            order.paymentStatus === paymentStatusFilter;
-
-          return matchOrderStatus && matchPaymentStatus;
-        }).map((order) => (
+       {filteredOrders.map((order) => (
           <div
             key={order._id}
             className="bg-white rounded-xl shadow p-6 space-y-4 my-4"
