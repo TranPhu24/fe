@@ -200,7 +200,7 @@ export function CheckoutForm() {
               <User className="w-6 h-6 text-red-600" />
             </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
-                              <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild>
                   <Link
                     href="/"
                     className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"
@@ -289,25 +289,51 @@ export function CheckoutForm() {
     <main className="bg-white shadow-sm sticky top-0 z-50 flex-1 pb-20">
     <div className="max-w-4xl mx-auto py-8 px-4">
       <h2 className="text-3xl font-bold mb-8 text-center">Thanh toán</h2>
+    <div className="bg-white border rounded-xl p-6 mb-8 shadow-sm">
+      <h3 className="font-semibold text-lg mb-4">Sản phẩm trong giỏ hàng</h3>
 
-      <div className="bg-white border rounded-xl p-6 mb-8 shadow-sm">
-        <h3 className="font-semibold text-lg mb-4">Sản phẩm trong giỏ hàng</h3>
-        <div className="space-y-3">
-          {cart.items.map((item) => (
-            <div key={item.product._id} className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{item.product.name}</p>
-                <p className="text-sm text-gray-500">x {item.quantity}</p>
-              </div>
-              <p className="font-semibold">{(item.price * item.quantity).toLocaleString()} đ</p>
+      <div className="space-y-3">
+        {cart.items.map((item) => (
+          <div
+            key={item.product._id}
+            className="flex justify-between items-center"
+          >
+            <div>
+              <p className="font-medium">{item.product.name}</p>
+              <p className="text-sm text-gray-500">x {item.quantity}</p>
             </div>
-          ))}
+            <p className="font-semibold">
+              {(item.price * item.quantity).toLocaleString()} đ
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t mt-4 pt-4 space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span>Tạm tính</span>
+          <span>{cart.totalPrice.toLocaleString()} đ</span>
         </div>
-        <div className="border-t mt-4 pt-4 flex justify-between text-lg font-bold">
-          <span>Tổng cộng</span>
-          <span className="text-red-600">{cart.totalPrice.toLocaleString()} đ</span>
+
+        <div className="flex justify-between">
+          <span>Giảm giá</span>
+          <span className="text-green-600">
+            -{cart.discount?.amount
+              ? cart.discount.amount.toLocaleString()
+              : 0} đ
+          </span>
         </div>
       </div>
+
+
+      <div className="border-t mt-4 pt-4 flex justify-between text-lg font-bold">
+        <span>Tổng cộng</span>
+        <span className="text-red-600">
+          {(cart.finalTotal).toLocaleString()} đ
+        </span>
+      </div>
+    </div>
+
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white border rounded-xl p-6 shadow-sm">

@@ -16,12 +16,19 @@ import { DropdownMenu,
 
 import { getCart, updateCartItem, removeCartItem } from "@/lib/api/cart";
 import { CartItem } from "@/lib/api/types";
+import { applyDiscount } from "@/lib/api/discount";
+import { ApplyDiscountResponse } from "@/lib/api/types";
+
 
 export function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [openSupport, setOpenSupport] = useState(false);
   const router = useRouter();
+  const [discountCode, setDiscountCode] = useState("");
+const [discountData, setDiscountData] = useState<ApplyDiscountResponse | null>(null);
+const [applyingDiscount, setApplyingDiscount] = useState(false);
+
   useEffect(() => {
     loadCart();
   }, []);
@@ -73,6 +80,29 @@ export function CartPage() {
     (sum, item) => sum + item.product.price * item.quantity,
     0
   );
+
+  const handleApplyDiscount = async () => {
+  if (!discountCode.trim()) {
+    toast.error("Vui lòng nhập mã giảm giá");
+    return;
+  }
+
+  setApplyingDiscount(true);
+
+  const res = await applyDiscount(discountCode.trim());
+
+  if (!res.success) {
+    toast.error(res.message || "Không áp dụng được mã giảm giá");
+    setDiscountData(null);
+    setApplyingDiscount(false);
+    return;
+  }
+
+  toast.success("Áp dụng mã giảm giá thành công");
+  setDiscountData(res.data!);
+  setApplyingDiscount(false);
+};
+
   
     const handleLogout = () => {
       Cookies.remove("access_token")
@@ -268,10 +298,23 @@ export function CartPage() {
             <div className="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center">
               <span className="font-semibold">Voucher</span>
 
-              <div className="flex items-center gap-2 text-red-600 font-medium cursor-pointer">
-                <span>Chọn hoặc nhập mã</span>
-                <ChevronRight size={20} />
-              </div>
+<div className="flex items-center gap-2">
+  <input
+    type="text"
+    placeholder="Nhập mã giảm giá"
+    value={discountCode}
+    onChange={(e) => setDiscountCode(e.target.value)}
+    className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+  />
+  <button
+    onClick={handleApplyDiscount}
+    disabled={applyingDiscount}
+    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+  >
+    Áp dụng
+  </button>
+</div>
+
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow-sm border">
@@ -283,10 +326,10 @@ export function CartPage() {
                   <span>{total.toLocaleString()} đ</span>
                 </div>
 
-                <div className="flex justify-between">
-                  <span>Giảm giá</span>
-                  <span className="text-green-600">-0 đ</span>
-                </div>
+<span className="text-green-600">
+  -{discountData?.discount.amount?.toLocaleString() || 0} đ
+</span>
+
 
                 <div className="flex justify-between">
                   <span>Phí giao hàng</span>
@@ -298,7 +341,7 @@ export function CartPage() {
                 <div className="flex justify-between text-xl font-bold">
                   <span>Tổng cộng</span>
                   <span className="text-red-600">
-                    {total.toLocaleString()} đ
+                    {(discountData?.finalTotal ?? total).toLocaleString()} đ
                   </span>
                 </div>
               </div>

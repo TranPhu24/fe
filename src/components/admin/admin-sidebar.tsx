@@ -9,7 +9,8 @@ import {
   ChevronDown,  
   Tag,
   Boxes,
-  FileText
+  FileText,
+  Ticket
 } from "lucide-react"
 
 import {
@@ -74,6 +75,12 @@ const menuItems = [
       },
     ],
   },
+    {
+    title: "Quản lý giảm giá",
+    url: "/dashboard/admin/discount",
+    icon: Ticket,
+  },
+
 ]
 
 export function AppSidebar() {

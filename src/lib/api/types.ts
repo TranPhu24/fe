@@ -123,6 +123,11 @@ export interface Cart {
   items: CartItem[]
   totalQuantity: number
   totalPrice: number
+  discount:{
+    code: string
+    amount: number
+  }
+  finalTotal: number
 }
 
 export interface OrderItem {
@@ -220,3 +225,38 @@ export type RawRevenueItem = {
   totalRevenue: number;
   totalOrders: number;
 };
+
+export interface Discount {
+  _id: string;
+  code: string;
+  type: "percentage" | "fixed" | "freeship";
+  value?: number;
+  maxDiscount?: number | null;
+  minOrderValue: number;
+  usageLimit?: number | null;
+  usedCount: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateDiscountDTO {
+  code: string;
+  type: "percentage" | "fixed" | "freeship";
+  value?: number;
+  maxDiscount?: number;
+  minOrderValue?: number;
+  usageLimit?: number;
+  startDate: string;
+  endDate: string;
+}
+export interface ApplyDiscountResponse {
+  discount: {
+    code: string;
+    amount: number;
+    type: "percentage" | "fixed" | "freeship";
+  };
+  totalPrice: number;
+  finalTotal: number;
+}
