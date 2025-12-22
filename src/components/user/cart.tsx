@@ -1,10 +1,7 @@
 "use client";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { X, Minus, Plus, ChevronRight, Facebook, Instagram, ShoppingCart, User, Bell } from "lucide-react";
-import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -13,108 +10,35 @@ import { DropdownMenu,
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useCart } from "@/hooks/user/useCart";
 
-import { getCart, updateCartItem, removeCartItem } from "@/lib/api/cart";
-import { CartItem } from "@/lib/api/types";
-import { applyDiscount } from "@/lib/api/discount";
-import { ApplyDiscountResponse } from "@/lib/api/types";
 
 
 export function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [openSupport, setOpenSupport] = useState(false);
-  const router = useRouter();
-  const [discountCode, setDiscountCode] = useState("");
-const [discountData, setDiscountData] = useState<ApplyDiscountResponse | null>(null);
-const [applyingDiscount, setApplyingDiscount] = useState(false);
 
-  useEffect(() => {
-    loadCart();
-  }, []);
-
-    const loadCart = async () => {
-    try {
-        setLoading(true);
-
-        const res = await getCart();
-
-        if (!res.success) {
-        toast.error(res.message || "Không thể tải giỏ hàng");
-        return;
-        }
-        toast.success(res.message);
-    setCartItems(res.data?.cart?.items || []);
-    } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : "Lỗi tải giỏ hàng";
-        toast.error(message);
-    } finally {
-        setLoading(false);
-    }
-    };
-  const handleUpdateQuantity = async (productId: string, quantity: number) => {
-    if (quantity < 1) return;
-
-    const res = await updateCartItem(productId, quantity);
-    if (!res.success) {
-      toast.error("Không cập nhật được số lượng");
-      return;
-    }
-
-    loadCart();
-  };
-
-  const handleRemove = async (productId: string) => {
-    const res = await removeCartItem(productId);
-
-    if (!res.success) {
-      toast.error("Không thể xóa sản phẩm");
-      return;
-    }
-
-    toast.success("Đã xóa khỏi giỏ hàng");
-    loadCart();
-  };
-
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
-
-  const handleApplyDiscount = async () => {
-  if (!discountCode.trim()) {
-    toast.error("Vui lòng nhập mã giảm giá");
-    return;
-  }
-
-  setApplyingDiscount(true);
-
-  const res = await applyDiscount(discountCode.trim());
-
-  if (!res.success) {
-    toast.error(res.message || "Không áp dụng được mã giảm giá");
-    setDiscountData(null);
-    setApplyingDiscount(false);
-    return;
-  }
-
-  toast.success("Áp dụng mã giảm giá thành công");
-  setDiscountData(res.data!);
-  setApplyingDiscount(false);
-};
-
-  
-    const handleLogout = () => {
-      Cookies.remove("access_token")
-      router.push("/auth/login")
-    }
-
+  const {
+    cartItems,
+    loading,
+    openSupport,
+    handleUpdateQuantity,
+    handleRemove,
+    total,
+    discountCode,
+    setDiscountCode,
+    discountData,
+    applyingDiscount,
+    handleApplyDiscount,
+    handleRemoveDiscount,
+    setOpenSupport,
+    handleLogout
+  } = useCart();
+ 
   return (
     <>
       <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-                  <div >
-                  </div>
+          <div >
+          </div>
           <div className="flex items-center gap-6">
             <button className="text-gray-700 text-2xl">
               <Bell className="w-6 h-6 text-gray-700" />
@@ -298,25 +222,34 @@ const [applyingDiscount, setApplyingDiscount] = useState(false);
             <div className="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center">
               <span className="font-semibold">Voucher</span>
 
-<div className="flex items-center gap-2">
-  <input
-    type="text"
-    placeholder="Nhập mã giảm giá"
-    value={discountCode}
-    onChange={(e) => setDiscountCode(e.target.value)}
-    className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-  />
-  <button
-    onClick={handleApplyDiscount}
-    disabled={applyingDiscount}
-    className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
-  >
-    Áp dụng
-  </button>
-</div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Nhập mã giảm giá"
+              value={discountCode}
+              onChange={(e) => setDiscountCode(e.target.value)}
+              className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              disabled={!!discountData}   
+            />
 
+            {!discountData ? (
+              <button
+                onClick={handleApplyDiscount}
+                disabled={applyingDiscount}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {applyingDiscount ? "Đang áp dụng..." : "Áp dụng"}
+              </button>
+            ) : (
+              <button
+                onClick={handleRemoveDiscount}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm font-medium hover:bg-gray-600 transition"
+              >
+                Xoá mã
+              </button>
+            )}
+          </div>
             </div>
-
             <div className="bg-white p-6 rounded-2xl shadow-sm border">
               <h3 className="font-bold text-lg mb-5">Chi tiết thanh toán</h3>
 
@@ -325,12 +258,9 @@ const [applyingDiscount, setApplyingDiscount] = useState(false);
                   <span>Tạm tính</span>
                   <span>{total.toLocaleString()} đ</span>
                 </div>
-
-<span className="text-green-600">
-  -{discountData?.discount.amount?.toLocaleString() || 0} đ
-</span>
-
-
+                <span className="text-green-600">
+                  -{discountData?.amount?.toLocaleString() || 0} đ
+                </span>
                 <div className="flex justify-between">
                   <span>Phí giao hàng</span>
                   <span className="text-green-600">Miễn phí</span>
@@ -341,7 +271,7 @@ const [applyingDiscount, setApplyingDiscount] = useState(false);
                 <div className="flex justify-between text-xl font-bold">
                   <span>Tổng cộng</span>
                   <span className="text-red-600">
-                    {(discountData?.finalTotal ?? total).toLocaleString()} đ
+                    {(total - (discountData?.amount || 0)).toLocaleString()} đ
                   </span>
                 </div>
               </div>

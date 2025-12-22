@@ -152,7 +152,7 @@ export  function CategoryPage() {
       <Breadcrumb className="border-b border-gray-200 pb-2 mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/admin">Trang chủ</BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard/admin/report">Trang chủ</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator>
             <SlashIcon />

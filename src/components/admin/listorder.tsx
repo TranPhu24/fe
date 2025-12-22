@@ -125,7 +125,7 @@ export function EmployeeOrderPage() {
         <Breadcrumb className="border-b border-gray-200 pb-2 mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/admin">Admin</BreadcrumbLink>
+            <BreadcrumbLink href="/dashboard/admin/report">Admin</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
           <BreadcrumbItem>

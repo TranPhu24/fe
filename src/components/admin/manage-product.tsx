@@ -378,8 +378,10 @@ export function ProductPage() {
 
       <Breadcrumb className="border-b pb-4 mb-6">
         <BreadcrumbList>
-          <BreadcrumbItem><BreadcrumbLink href="/dashboard/admin">Admin</BreadcrumbLink></BreadcrumbItem>
-          <BreadcrumbSeparator><SlashIcon /></BreadcrumbSeparator>
+          <BreadcrumbItem><BreadcrumbLink href="/dashboard/admin/report">Admin</BreadcrumbLink></BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <SlashIcon />
+          </BreadcrumbSeparator>
           <BreadcrumbItem><BreadcrumbLink href="/dashboard/admin/product/food">Sản phẩm</BreadcrumbLink></BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>

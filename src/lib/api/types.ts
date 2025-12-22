@@ -260,3 +260,8 @@ export interface ApplyDiscountResponse {
   totalPrice: number;
   finalTotal: number;
 }
+
+export interface CartDiscount {
+  code: string;
+  amount: number;
+}

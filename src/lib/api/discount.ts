@@ -98,3 +98,31 @@ export async function getAllDiscounts(): Promise<
     },
   };
 }
+
+export async function removeDiscount(): Promise<
+ApiResponse<null>> {
+  const accessToken = Cookies.get("access_token");
+
+  const res = await fetch(`${API_BASE}/api/discounts/remove`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      success: false,
+      message: data.message || "Huỷ mã giảm giá thất bại",
+    };
+  }
+
+  return {
+    success: true,
+    message: data.message || "Đã huỷ mã giảm giá",
+    data: null,
+  };
+}

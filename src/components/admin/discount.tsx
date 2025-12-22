@@ -1,6 +1,4 @@
 "use client";
-
-import { useState, useEffect } from "react";
 import { SlashIcon, TrashIcon } from "lucide-react";
 
 import {
@@ -23,95 +21,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
-
-import {
-  createDiscount,
-  getAllDiscounts,
-} from "@/lib/api/discount";
-
-import { Discount, CreateDiscountDTO } from "@/lib/api/types";
+import { useDiscount } from "@/hooks/admin/useDiscount";
 
 export function DiscountPage() {
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-
-  const [form, setForm] = useState<CreateDiscountDTO>({
-    code: "",
-    type: "percentage",
-    value: 0,
-    minOrderValue: 0,
-    usageLimit: 0,
-    startDate: "",
-    endDate: "",
-  });
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-
-      const res = await getAllDiscounts();
-      if (!res.success) {
-        toast.error(res.message);
-        return;
-      }
-
-      setDiscounts(res.data!.discounts);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Lỗi tải mã giảm giá";
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddDiscount = async () => {
-    if (!form.code || !form.startDate || !form.endDate) {
-      toast.warning("Vui lòng nhập đầy đủ thông tin bắt buộc");
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-
-      const payload: CreateDiscountDTO = {
-        ...form,
-        code: form.code.toUpperCase(),
-        value: form.type === "freeship" ? undefined : form.value,
-      };
-
-      const res = await createDiscount(payload);
-
-      if (!res.success) {
-        toast.error(res.message);
-        return;
-      }
-
-      toast.success("Tạo mã giảm giá thành công");
-
-      setForm({
-        code: "",
-        type: "percentage",
-        value: 0,
-        minOrderValue: 0,
-        usageLimit: 0,
-        startDate: "",
-        endDate: "",
-      });
-
-      await loadData();
-    } catch {
-      toast.error("Tạo mã giảm giá thất bại");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+  const{
+    form,
+    setForm,
+    submitting,
+    loading,
+    discounts,
+    handleAddDiscount,
+  } = useDiscount();
+  
   const renderDiscountList = () => (
     <div className="space-y-3 border rounded-lg p-4 shadow-sm bg-white">
       <h2 className="text-lg font-semibold mb-3">
