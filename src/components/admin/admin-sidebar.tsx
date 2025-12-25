@@ -10,7 +10,8 @@ import {
   Tag,
   Boxes,
   FileText,
-  Ticket
+  Ticket,
+  Bell,
 } from "lucide-react"
 
 import {
@@ -79,6 +80,10 @@ const menuItems = [
     title: "Quản lý giảm giá",
     url: "/dashboard/admin/discount",
     icon: Ticket,
+  },
+  {title: "Quản lý thông báo",
+    url: "/dashboard/admin/notify",
+    icon: Bell,
   },
 
 ]

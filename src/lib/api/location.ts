@@ -14,7 +14,7 @@ export async function getWardsByProvince(provinceCode: number): Promise<Ward[]> 
     const res = await fetch(`https://provinces.open-api.vn/api/v2/p/${provinceCode}?depth=2`)
     if (!res.ok) throw new Error("Lỗi load phường/xã")
     const data = await res.json()
-    return data.wards || [] // nested wards trong response
+    return data.wards || [] 
   } catch {
     return []
   }

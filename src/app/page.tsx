@@ -55,19 +55,7 @@ export default function Home() {
   <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-        <div className="text-lg font-extrabold bg-gradient-to-r from-red-600 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
-          Món nóng hổi - Giao tận nơi
-        </div>
-        <div className="flex items-center gap-6">
-        <Image
-          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1765801044/Gemini_Generated_Image_lrzm5ilrzm5ilrzm_vxnf3n.png"
-          alt="User Avatar"
-          width={60}
-          height={60}
-          className="rounded-full cursor-pointer"
-        />
-        </div>
-
+        <div></div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />
@@ -187,80 +175,79 @@ export default function Home() {
     </section>
 
     {/* Category */}
-<nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
-  <div className="max-w-7xl mx-auto px-4">
-    <div className="flex items-center gap-8 lg:gap-12 py-6 overflow-x-auto scrollbar-hide">
-      {/* Nút search - cố định */}
-      <div className="flex-shrink-0">
-        <button
-          onClick={() => setIsSearchOpen(!isSearchOpen)}
-          className="flex items-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-200 whitespace-nowrap"
-          aria-label="Mở/đóng tìm kiếm"
-        >
-          <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
-      </div>
+    <nav className="bg-white sticky top-16 z-40 border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center gap-8 lg:gap-12 py-6 overflow-x-auto scrollbar-hide">
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="flex items-center gap-3 text-gray-700 hover:text-red-600 transition-all duration-200 whitespace-nowrap"
+              aria-label="Mở/đóng tìm kiếm"
+            >
+              <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
 
-      <div
-        className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
-          isSearchOpen ? 'w-full max-w-2xl opacity-100' : 'w-0 max-w-0 opacity-0'
-        } overflow-hidden`}
-      >
-        <div className="relative min-w-[300px] lg:min-w-[400px]">
-          <input
-            type="text"
-            placeholder="Tìm kiếm món ăn..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            autoFocus={isSearchOpen}
-            className="w-full px-5 py-3 pl-12 pr-12 text-lg font-bold rounded-full border border-gray-300 focus:border-red-500 focus:outline-none shadow-md transition-all"
-          />
-          
-          <button
-            onClick={() => {
-              if (searchQuery) {
-                setSearchQuery("");
-              } else {
-                setIsSearchOpen(false);
-              }
-            }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
+          <div
+            className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
+              isSearchOpen ? 'w-full max-w-2xl opacity-100' : 'w-0 max-w-0 opacity-0'
+            } overflow-hidden`}
           >
-            <X className="w-6 h-6" />
-          </button>
+            <div className="relative min-w-[300px] lg:min-w-[400px]">
+              <input
+                type="text"
+                placeholder="Tìm kiếm món ăn..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                autoFocus={isSearchOpen}
+                className="w-full px-5 py-3 pl-12 pr-12 text-lg font-bold rounded-full border border-gray-300 focus:border-red-500 focus:outline-none shadow-md transition-all"
+              />
+              
+              <button
+                onClick={() => {
+                  if (searchQuery) {
+                    setSearchQuery("");
+                  } else {
+                    setIsSearchOpen(false);
+                  }
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 transition"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0">
+            {loadingCategories ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
+              ))
+            ) : (
+              categories.map((c) => (
+                <a
+                  key={c._id}
+                  href={`#${c.name}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
+                    ${activeCategory === c.name
+                      ? "text-red-600 border-red-600"
+                      : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
+                    }`}
+                >
+                  {c.name}
+                </a>
+              ))
+            )}
+          </div>
         </div>
       </div>
-
-      <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0">
-        {loadingCategories ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
-          ))
-        ) : (
-          categories.map((c) => (
-            <a
-              key={c._id}
-              href={`#${c.name}`}
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
-                ${activeCategory === c.name
-                  ? "text-red-600 border-red-600"
-                  : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
-                }`}
-            >
-              {c.name}
-            </a>
-          ))
-        )}
-      </div>
-    </div>
-  </div>
-</nav>
+    </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
         {searchQuery.trim() !== "" ? (
@@ -327,8 +314,14 @@ export default function Home() {
                   }}
                   className="scroll-mt-48"
                 >
-                  <h2 className="text-2xl font-bold mb-6">{category.name}</h2>
+                  <div className="flex items-center justify-center mb-6">
+                    <span className="h-[2px] w-64 bg-red-600 mr-4"></span>
 
+                    <h2 className="text-2xl font-bold text-center">
+                      {category.name}
+                    </h2>
+                    <span className="h-[2px] w-64 bg-red-600 ml-4"></span>
+                  </div>
                   {loadingProducts ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       {Array.from({ length: 8 }).map((_, i) => (

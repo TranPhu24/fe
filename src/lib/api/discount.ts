@@ -28,7 +28,6 @@ export async function applyDiscount(
       message: data.message || "Áp dụng mã giảm giá thất bại",
     };
   }
-
   return {
     success: true,
     message: data.message || "Áp dụng mã giảm giá thành công",
@@ -59,7 +58,6 @@ export async function createDiscount(
       message: data.message || "Tạo mã giảm giá thất bại",
     };
   }
-
   return {
     success: true,
     message: data.message || "Tạo mã giảm giá thành công",
@@ -119,7 +117,6 @@ ApiResponse<null>> {
       message: data.message || "Huỷ mã giảm giá thất bại",
     };
   }
-
   return {
     success: true,
     message: data.message || "Đã huỷ mã giảm giá",

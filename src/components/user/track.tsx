@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import Cookies from "js-cookie";
+import { getSocket } from "@/lib/api/socket";
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getOrderById, cancelOrder } from "@/lib/api/order";
@@ -52,6 +53,52 @@ export function OrderDetailPage() {
     }, [loadOrder]);
 
 
+    useEffect(() => {
+  if (!id) return;
+
+  const socket = getSocket();
+
+
+  socket.emit("joinOrderRoom", id);
+
+  // lắng nghe realtime
+  socket.on("orderStatusUpdated", (data) => {
+    // chỉ xử lý đúng đơn đang xem
+    if (data.orderId !== id) return;
+
+    showOrderStatusToast(data.orderStatus);
+    // reload order để update timeline
+    loadOrder();
+  });
+
+  return () => {
+    socket.off("orderStatusUpdated");
+  };
+}, [id, loadOrder]);
+
+const showOrderStatusToast = (status: string) => {
+  const map: Record<string, () => void> = {
+    confirmed: () =>
+      toast.info("Đơn hàng đã được xác nhận"),
+
+    preparing: () =>
+      toast.info("Đơn hàng đang chuẩn bị"),
+
+    shipping: () =>
+      toast.success("Đơn hàng đang được giao"),
+
+    completed: () =>
+      toast.success("Đơn hàng đã hoàn thành"),
+
+    cancelled: () =>
+      toast.error("Đơn hàng đã bị huỷ"),
+  };
+
+  map[status]?.();
+};
+
+
+
   if (loading) {
     return <p className="text-center py-20">Đang tải đơn hàng...</p>;
   }
@@ -82,26 +129,16 @@ export function OrderDetailPage() {
     let currentStep = 0;
 
     switch (status) {
-        case "pending":
-        currentStep = 0;
+        case "pending":currentStep = 0;
         break;
-
-        case "confirmed":
-        currentStep = 1;
+        case "confirmed":currentStep = 1;
         break;
-
-        case "preparing":
-        currentStep = 2;
+        case "preparing":currentStep = 2;
         break;
-
-        case "shipping":
-        currentStep = 3;
+        case "shipping":currentStep = 3;
         break;
-
-        case "completed":
-        currentStep = 4;
+        case "completed":currentStep = 4;
         break;
-
         case "cancelled":
         return {
             currentStep: -1,

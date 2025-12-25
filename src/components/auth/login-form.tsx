@@ -30,6 +30,7 @@ export function LoginForm({
     validateEmail,
     validatePassword,
     handleSubmit,
+    handleGoogleLogin
   } = useLoginForm();
 
   return (
@@ -94,7 +95,12 @@ export function LoginForm({
               >
                 {loading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
+ 
             </div>
+              <Button variant="outline" className="w-full mt-4" 
+              onClick={handleGoogleLogin}>
+                Login with Google
+              </Button>
 
             <div className="mt-4 text-center text-sm">
               Không có tài khoản?{" "}

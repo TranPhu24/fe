@@ -23,24 +23,36 @@ export function handleLogin(
   const role = decoded.role as UserRole;
   const userId = decoded.sub;
 
-  Cookies.set("access_token", accessToken, { secure: true, sameSite: "strict" });
-  Cookies.set("refresh_token", refreshToken, { secure: true, sameSite: "strict" });
-  Cookies.set("userId", userId, { secure: true, sameSite: "strict" });
+  const isProd = process.env.NODE_ENV === "production";
+
+  Cookies.set("access_token", accessToken, {
+    secure: isProd,
+    sameSite: "lax",
+  });
+
+  Cookies.set("refresh_token", refreshToken, {
+    secure: isProd,
+    sameSite: "lax",
+  });
+
+  Cookies.set("userId", userId, {
+    secure: isProd,
+    sameSite: "lax",
+  });
 
   switch (role) {
     case "admin":
-      router.push("/dashboard/admin/report");
+      router.replace("/dashboard/admin/report");
       break;
     case "employee":
-      router.push("/dashboard/employee");
+      router.replace("/dashboard/employee");
       break;
     case "user":
-      router.push("/");
-      break;
     default:
-      router.push("/");
+      router.replace("/");
   }
 }
+
 
 export async function loginApi(
   email: string,

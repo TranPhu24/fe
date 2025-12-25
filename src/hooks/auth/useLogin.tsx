@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { loginApi } from "@/lib/api/auth";
+import { loginApi, } from "@/lib/api/auth";
+
 
 export function useLoginForm() {
   const router = useRouter();
@@ -63,6 +64,10 @@ export function useLoginForm() {
       setLoading(false);
     }
   };
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/google`;
+  };
+
 
   return {
     email,
@@ -77,5 +82,6 @@ export function useLoginForm() {
     validateEmail,
     validatePassword,
     handleSubmit,
+    handleGoogleLogin
   };
 }

@@ -20,7 +20,6 @@ export async function createCategory(
   if (!res.ok) {
     return { success: false, message: data.message ?? "Tạo danh mục thất bại" };
   }
-
   return {
     success: true,
     message: data.message ?? "Tạo danh mục thành công",
@@ -44,7 +43,6 @@ export async function getAllCategories(): Promise<
   if (!res.ok) {
     return { success: false, message: data.message ?? "Lấy danh sách thất bại" };
   }
-
   return {
     success: true,
     message: data.message ?? "Lấy danh sách thành công",
@@ -72,7 +70,6 @@ export async function updateCategory(
   if (!res.ok) {
     return { success: false, message: data.message ?? "Cập nhật thất bại" };
   }
-
   return {
     success: true,
     message: data.message ?? "Cập nhật thành công",
@@ -96,7 +93,6 @@ export async function deleteCategory(
   if (!res.ok) {
     return { success: false, message: data.message ?? "Xoá thất bại" };
   }
-
   return {
     success: true,
     message: data.message ?? "Xoá danh mục thành công",

@@ -143,6 +143,7 @@ export interface ShippingAddress {
   address: string;
   city: string;
   ward: string;
+  isDefault?: boolean;
 }
 
 type PaymentMethod = "COD" | "VNPAY";
@@ -213,6 +214,7 @@ export interface Ward {
   district_code: number  
 }
 
+// report & revenue
 export type RevenueType = "day" | "week" | "month";
 
 export type RawRevenueItem = {
@@ -226,6 +228,7 @@ export type RawRevenueItem = {
   totalOrders: number;
 };
 
+// discount
 export interface Discount {
   _id: string;
   code: string;
@@ -264,4 +267,40 @@ export interface ApplyDiscountResponse {
 export interface CartDiscount {
   code: string;
   amount: number;
+}
+// notification
+export interface Notification {
+  _id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  createdBy: {
+    _id: string;
+    username: string;
+    email: string;
+  };
+  createdAt: string;
+}
+
+export interface CreateNotificationDto {
+  title: string;
+  message: string;
+}
+
+export interface User {
+  _id: string;
+  username: string;
+  email: string;
+  phone: string;
+  role: "user" | "employee" | "admin";
+
+  addresses?: ShippingAddress[];
+
+  createdAt: string;
+  updatedAt: string;
 }

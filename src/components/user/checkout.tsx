@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { getCart, } from "@/lib/api/cart"
 import { createOrder, createVNPayPayment } from "@/lib/api/order"
 import { getProvinces, getWardsByProvince } from "@/lib/api/location"
+import { getMe } from "@/lib/api/user"
 
 import { useRouter } from "next/navigation"
 import { Cart, Province, Ward } from "@/lib/api/types"
@@ -45,6 +46,8 @@ export function CheckoutForm() {
   const [provinces, setProvinces] = useState<Province[]>([])
   const [wards, setWards] = useState<Ward[]>([])
   const [loadingLocation, setLoadingLocation] = useState(false)
+  const [saveAddress, setSaveAddress] = useState(true);
+
 
   useEffect(() => {
     loadCart();
@@ -86,7 +89,6 @@ export function CheckoutForm() {
     }
   };
 
-
   useEffect(() => {
     if (!form.city) {
       setWards([]);
@@ -117,6 +119,29 @@ export function CheckoutForm() {
     }
   };
 
+  useEffect(() => {
+    fetchMe();
+  }, []);
+  const fetchMe = async () => {
+    const res = await getMe();
+
+    if (!res.success || !res.data) return;
+
+    const defaultAddress = res.data.user.addresses?.find(
+      (a) => a.isDefault
+    );
+
+    if (!defaultAddress) return;
+
+    setForm((prev) => ({
+      ...prev,
+      fullName: defaultAddress.fullName,
+      phone: defaultAddress.phone,
+      address: defaultAddress.address,
+      city: defaultAddress.city,
+      ward: defaultAddress.ward,
+    }));
+  };
 
   if (loading) return <p className="text-center py-10">Đang tải...</p>
   if (!cart || cart.items.length === 0)
@@ -134,27 +159,22 @@ export function CheckoutForm() {
     if (!form.address.trim())
       return toast.error("Vui lòng nhập địa chỉ chi tiết");
 
-    const shippingAddress = {
-      fullName: form.fullName.trim(),
-      phone: form.phone.trim(),
-      address: form.address.trim(),
-      city: form.cityName || form.city,
-      ward: form.wardName || form.ward,
-      cityCode: form.city,
-      wardCode: form.ward,
-    };
-
     const res = await createOrder(
       paymentMethod,
-      shippingAddress,
-      form.note.trim()
+      {
+        fullName: form.fullName,
+        phone: form.phone,
+        address: form.address,
+        city: form.city,
+        ward: form.ward,
+        saveAddress, 
+      },
+      form.note
     );
-
     if (!res.success || !res.data) {
       toast.error(res.message);
       return;
     }
-
     const order = res.data.order;
     if (paymentMethod === "VNPAY") {
       const vnpayRes = await createVNPayPayment(order._id);
@@ -179,9 +199,9 @@ export function CheckoutForm() {
   const handleWardChange = (code: string, name: string) => {
     setForm(prev => ({ ...prev, ward: code, wardName: name }))
   }
-      const handleLogout = () => {
-      Cookies.remove("access_token")
-      router.push("/auth/login")
+  const handleLogout = () => {
+  Cookies.remove("access_token")
+  router.push("/auth/login")
     }
 
   return (
@@ -339,6 +359,19 @@ export function CheckoutForm() {
         <div className="bg-white border rounded-xl p-6 shadow-sm">
           <h3 className="font-semibold text-lg mb-5">Thông tin nhận hàng</h3>
 
+            <div className="mt-4 flex items-center gap-2">
+            <input
+              id="saveAddress"
+              type="checkbox"
+              checked={saveAddress}
+              onChange={(e) => setSaveAddress(e.target.checked)}
+              className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+            />
+            <label htmlFor="saveAddress" className="text-sm">
+              Lưu địa chỉ này cho lần đặt hàng sau
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-medium mb-1">Họ và tên <span className="text-red-600">*</span></label>
@@ -432,6 +465,7 @@ export function CheckoutForm() {
 
           <div className="mt-4">
             <label className="block font-medium mb-1">Địa chỉ chi tiết <span className="text-red-600">*</span></label>
+
             <input
               type="text"
               required

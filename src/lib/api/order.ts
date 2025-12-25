@@ -5,7 +5,7 @@ import { ApiResponse, Order, ShippingAddress } from "./types";
 
 export async function createOrder(
   paymentMethod: string,
-  shippingAddress: ShippingAddress,
+  newAddress: ShippingAddress & { saveAddress?: boolean },
   note?: string
 ): Promise<ApiResponse<{ order: Order }>> {
   const accessToken = Cookies.get("access_token");
@@ -16,7 +16,7 @@ export async function createOrder(
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ paymentMethod, shippingAddress, note }),
+    body: JSON.stringify({ paymentMethod, newAddress, note }),
   });
 
   const data = await res.json();
@@ -38,9 +38,8 @@ export async function createOrder(
 }
 
 
-export async function getMyOrders(): Promise<
-  ApiResponse<{ orders: Order[] }>
-> {
+export async function getMyOrders(
+): Promise<ApiResponse<{ orders: Order[] }>> {
   const accessToken = Cookies.get("access_token");
 
   const res = await fetch(`${API_BASE}/api/orders/my-orders`, {
