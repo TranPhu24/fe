@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { GoogleCallbackPage } from "@/components/auth/google";
+import { GoogleCallbackPage } from "@/app/auth/google/callback/google";
 
 export default function Page() {
   return (
