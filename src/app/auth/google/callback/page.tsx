@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { Suspense } from "react";
 import { GoogleCallbackPage } from "@/app/auth/google/callback/google";
 
