@@ -119,7 +119,7 @@ export function EmployeeOrderPage() {
     <>
       <div className="p-6 w-full min-w-[80vw] mx-auto">
         <h1 className="text-2xl font-bold">
-          Cập nhật trạng thái đơn hàng
+          Danh sách đơn hàng
         </h1>
 
         <Breadcrumb className="border-b border-gray-200 pb-2 mb-6">

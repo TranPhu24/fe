@@ -159,7 +159,7 @@ export function EmployeeOrderPage() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <div className="p-6 w-full min-w-[80vw] mx-auto">
         <h1 className="text-2xl font-bold">
           Cập nhật trạng thái đơn hàng
         </h1>
@@ -211,7 +211,7 @@ export function EmployeeOrderPage() {
        {filteredOrders.map((order) => (
           <div
             key={order._id}
-            className="bg-white rounded-xl shadow p-6 space-y-4"
+            className="bg-white rounded-xl shadow p-6 space-y-4 mt-4"
           >
             <div className="flex justify-between items-start gap-4">
               <div>
