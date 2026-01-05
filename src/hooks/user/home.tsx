@@ -185,10 +185,9 @@ export function useHomePage() {
   };
 
   useEffect(() => {
-    if (openNotification) {
-      loadNotifications();
-    }
-  }, [openNotification]);
+  loadNotifications();
+}, []);
+
 
   useEffect(() => {
   if (!productsByCategory.length) return;
