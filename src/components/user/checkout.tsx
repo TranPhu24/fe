@@ -33,9 +33,9 @@ export function CheckoutForm() {
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
-    city: "",        
+    cityCode: 0,        
     cityName: "",    
-    ward: "",       
+    wardCode: 0,       
     wardName: "",    
     address: "",
     note: "",
@@ -90,12 +90,12 @@ export function CheckoutForm() {
   };
 
   useEffect(() => {
-    if (!form.city) {
+    if (!form.cityCode) {
       setWards([]);
       setForm(prev => ({
         ...prev,
         cityName: "",
-        ward: "",
+        wardCode: 0,
         wardName: "",
       }));
       return;
@@ -103,12 +103,12 @@ export function CheckoutForm() {
 
     loadWards();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.city]);
+  }, [form.cityCode]);
   const loadWards = async () => {
     try {
       setLoadingLocation(true);
 
-      const data = await getWardsByProvince(Number(form.city));
+      const data = await getWardsByProvince(Number(form.cityCode));
       setWards(data);
     } catch (err: unknown) {
       const message =
@@ -138,8 +138,10 @@ export function CheckoutForm() {
       fullName: defaultAddress.fullName,
       phone: defaultAddress.phone,
       address: defaultAddress.address,
-      city: defaultAddress.city,
-      ward: defaultAddress.ward,
+      cityCode: defaultAddress.cityCode,
+      cityName: defaultAddress.city,
+      wardCode: defaultAddress.wardCode,
+      wardName: defaultAddress.ward,
     }));
   };
 
@@ -154,8 +156,8 @@ export function CheckoutForm() {
     if (!form.phone.trim()) return toast.error("Vui lòng nhập số điện thoại");
     if (!/^\d{9,11}$/.test(form.phone.replace(/\D/g, "")))
       return toast.error("Số điện thoại không hợp lệ");
-    if (!form.city) return toast.error("Vui lòng chọn Tỉnh/Thành phố");
-    if (!form.ward) return toast.error("Vui lòng chọn Phường/Xã");
+    if (!form.cityCode) return toast.error("Vui lòng chọn Tỉnh/Thành phố");
+    if (!form.wardCode) return toast.error("Vui lòng chọn Phường/Xã");
     if (!form.address.trim())
       return toast.error("Vui lòng nhập địa chỉ chi tiết");
 
@@ -165,8 +167,11 @@ export function CheckoutForm() {
         fullName: form.fullName,
         phone: form.phone,
         address: form.address,
-        city: form.city,
-        ward: form.ward,
+        cityCode: form.cityCode,
+        city: form.cityName,
+        wardCode: form.wardCode,
+        ward: form.wardName,
+
         saveAddress, 
       },
       form.note
@@ -192,12 +197,12 @@ export function CheckoutForm() {
   };
 
 
-  const handleProvinceChange = (code: string, name: string) => {
-    setForm(prev => ({ ...prev, city: code, cityName: name, ward: "", wardName: "" }))
+  const handleProvinceChange = (code: number, name: string) => {
+    setForm(prev => ({ ...prev, cityCode: code, cityName: name, wardCode: 0, wardName: "" }))
   }
 
-  const handleWardChange = (code: string, name: string) => {
-    setForm(prev => ({ ...prev, ward: code, wardName: name }))
+  const handleWardChange = (code: number, name: string) => {
+    setForm(prev => ({ ...prev, wardCode: code, wardName: name }))
   }
   const handleLogout = () => {
   Cookies.remove("access_token")
@@ -402,13 +407,13 @@ export function CheckoutForm() {
             <div>
               <label className="block font-medium mb-1">Tỉnh/Thành phố <span className="text-red-600">*</span></label>
                 <Select
-                  value={form.city || ""}
+                  value={form.cityCode ? form.cityCode.toString() : ""}
                   onValueChange={(value) => {
                     const selected = provinces.find(
-                      (p) => p.code === parseInt(value)
+                      (p) => p.code === Number(value)
                     );
                     if (selected) {
-                      handleProvinceChange(value, selected.name);
+                      handleProvinceChange(Number(value), selected.name);
                     }
                   }}
                 >
@@ -432,18 +437,19 @@ export function CheckoutForm() {
 
             <div>
               <label className="block font-medium mb-1">Phường/Xã <span className="text-red-600">*</span></label>
-                <Select
-                  value={form.ward || ""}
-                  disabled={!form.city || loadingLocation}
-                  onValueChange={(value) => {
-                    const selected = wards.find(
-                      (w) => w.code === parseInt(value)
-                    );
-                    if (selected) {
-                      handleWardChange(value, selected.name);
-                    }
-                  }}
-                >
+              <Select
+                value={form.wardCode ? form.wardCode.toString() : ""}
+                disabled={!form.cityCode || loadingLocation}
+                onValueChange={(value) => {
+                  const selected = wards.find(
+                    (w) => w.code === Number(value)
+                  );
+                  if (selected) {
+                    handleWardChange(Number(value), selected.name);
+                  }
+                }}
+              >
+
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Chọn phường/xã" />
                   </SelectTrigger>

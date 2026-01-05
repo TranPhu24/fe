@@ -63,11 +63,9 @@ export function OrderDetailPage() {
 
   // lắng nghe realtime
   socket.on("orderStatusUpdated", (data) => {
-    // chỉ xử lý đúng đơn đang xem
     if (data.orderId !== id) return;
 
     showOrderStatusToast(data.orderStatus);
-    // reload order để update timeline
     loadOrder();
   });
 
@@ -96,8 +94,6 @@ const showOrderStatusToast = (status: string) => {
 
   map[status]?.();
 };
-
-
 
   if (loading) {
     return <p className="text-center py-20">Đang tải đơn hàng...</p>;
@@ -169,7 +165,6 @@ const showOrderStatusToast = (status: string) => {
         sub: formatTime(completedAt),
       },
     ];
-
     return { currentStep, steps };
   };
 
@@ -208,8 +203,8 @@ const showOrderStatusToast = (status: string) => {
     <>
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
-              <div >
-              </div>
+        <div >
+        </div>
         <div className="flex items-center gap-6">
           <button className="text-gray-700 text-2xl">
             <Bell className="w-6 h-6 text-gray-700" />
@@ -374,7 +369,7 @@ const showOrderStatusToast = (status: string) => {
         <h2 className="font-bold mb-4">Địa chỉ giao hàng</h2>
         <p className="text-lg">Họ tên người nhận: <b>{order.shippingAddress.fullName}</b></p>
         <p className="text-lg">Sô điện thoại: <b>{order.shippingAddress.phone}</b></p>
-        <p className="text-lg"> Địa chỉ nhận hàng: <b>{order.shippingAddress.address}, {order.shippingAddress.city}</b></p>
+        <p className="text-lg"> Địa chỉ nhận hàng: <b>{order.shippingAddress.address}, {order.shippingAddress.ward}, {order.shippingAddress.city},</b></p>
     </div>
 
       <div className="bg-white rounded-xl shadow p-6">

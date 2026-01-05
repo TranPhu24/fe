@@ -142,9 +142,12 @@ export interface ShippingAddress {
   phone: string;
   address: string;
   city: string;
+  cityCode: number
   ward: string;
+  wardCode: number;
   isDefault?: boolean;
 }
+
 
 type PaymentMethod = "COD" | "VNPAY";
 

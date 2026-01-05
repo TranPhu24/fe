@@ -5,6 +5,13 @@ import { X, Minus, Plus, ChevronRight, Facebook, Instagram, ShoppingCart, User, 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
@@ -12,8 +19,7 @@ import { DropdownMenu,
 } from "@/components/ui/dropdown-menu";
 import { useCart } from "@/hooks/user/useCart";
 
-
-
+import { useHomePage } from "@/hooks/user/home";
 export function CartPage() {
 
   const {
@@ -32,7 +38,14 @@ export function CartPage() {
     setOpenSupport,
     handleLogout
   } = useCart();
- 
+
+  const{
+    notifications,
+    openNotification,
+    setOpenNotification,
+    loadingNotifications
+  }=useHomePage();
+  
   return (
     <>
       <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -40,16 +53,50 @@ export function CartPage() {
           <div >
           </div>
           <div className="flex items-center gap-6">
-            <button className="text-gray-700 text-2xl">
-              <Bell className="w-6 h-6 text-gray-700" />
-            </button>
+          <Sheet open={openNotification} onOpenChange={setOpenNotification}>
+            <SheetTrigger asChild>
+              <button className="relative">
+                <Bell className="w-6 h-6 text-gray-700" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[480px]">
+              <SheetHeader>
+                <SheetTitle className="text-red-500 font-bold">THÔNG BÁO</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 space-y-3 w-[350px]">
+                {loadingNotifications ? (
+                  <p className="text-gray-500">Đang tải thông báo...</p>
+                ) : notifications.length === 0 ? (
+                  <p className="text-gray-500 text-center">Không có thông báo</p>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n._id}
+                      className="p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                    >
+                      <p className="font-medium text-red-500">{n.title}</p>
+                      <p className="text-sm text-black">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(n.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 border border-red-500 text-red-600 rounded-full px-4 py-1  ">
                 <span className="text-xl">☰</span>
                 <User className="w-6 h-6 text-red-600" />
               </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 p-2 border shadow-lg rounded-xl">
-                                <DropdownMenuItem asChild>
+                <DropdownMenuItem asChild>
                   <Link
                     href="/"
                     className="w-full rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-red-50 hover:text-red-600 focus:bg-red-50 focus:text-red-600 focus:outline-none transition-all duration-200"

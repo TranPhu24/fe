@@ -35,11 +35,11 @@ payload: CreateNotificationDto
 
 export async function getAllNotifications(
 ): Promise<ApiResponse<{ notifications: Notification[] }>> {
-  const accessToken = Cookies.get("access_token");
     const res = await fetch(`${API_BASE}/api/notifications`, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${accessToken}`},
+      "Content-Type": "application/json",
+    },
   });
     const data = await res.json();
     if (!res.ok) {

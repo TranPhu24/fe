@@ -1,8 +1,14 @@
 "use client";
 import Image from "next/image";
-import { Facebook, Instagram, X, Minus, Plus,  Bell, ShoppingCart, User } from "lucide-react";
+import { Facebook, Instagram, X, Minus, Plus, Heart,  Bell, ShoppingCart, User, DiamondIcon, BoxIcon, TicketIcon , MessageCircle} from "lucide-react";
 import Link from "next/link";
-
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import {
   Dialog,
   DialogContent,
@@ -49,6 +55,19 @@ export default function Home() {
     handleOpenProductDetail,
     handleAddToCart,
     handleLogout,
+    notifications,
+    openNotification,
+    setOpenNotification,
+    loadingNotifications,
+    chatMessages,
+    chatLoading,
+    chatInput,
+    setChatInput,
+    handleSendChat,
+    isOpen,
+    setIsOpen,
+    favoriteIds,
+    handleToggleFavorite,
   } = useHomePage();
   
   return (
@@ -57,10 +76,43 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center h-16">
         <div></div>
         <div className="flex items-center gap-6">
-          <button className="text-gray-700 text-2xl">
-            <Bell className="w-6 h-6 text-gray-700" />
-          </button>
-
+          <Sheet open={openNotification} onOpenChange={setOpenNotification}>
+            <SheetTrigger asChild>
+              <button className="relative">
+                <Bell className="w-6 h-6 text-gray-700" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[480px]">
+              <SheetHeader>
+                <SheetTitle className="text-red-500 font-bold">THÔNG BÁO</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4 space-y-3 w-[350px]">
+                {loadingNotifications ? (
+                  <p className="text-gray-500">Đang tải thông báo...</p>
+                ) : notifications.length === 0 ? (
+                  <p className="text-gray-500 text-center">Không có thông báo</p>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n._id}
+                      className="p-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                    >
+                      <p className="font-medium text-red-500">{n.title}</p>
+                      <p className="text-sm text-black">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(n.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
           <Link href="./dashboard/user/cart" className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 hover:border-gray-400 hover:bg-gray-50 transition-all">
             <span className="text-sm font-semibold text-gray-700">
               {cartCount}
@@ -189,12 +241,11 @@ export default function Home() {
               </svg>
             </button>
           </div>
-
-          <div
-            className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
-              isSearchOpen ? 'w-full max-w-2xl opacity-100' : 'w-0 max-w-0 opacity-0'
-            } overflow-hidden`}
-          >
+        <div
+          className={`transition-all duration-300 ease-in-out overflow-hidden
+            ${isSearchOpen ? 'flex-1 opacity-100' : 'w-0 opacity-0'}
+          `}
+        >
             <div className="relative min-w-[300px] lg:min-w-[400px]">
               <input
                 type="text"
@@ -220,7 +271,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0">
+          <div
+  className={`flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0
+    transition-all duration-300
+    ${isSearchOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
+  `}
+>
+
             {loadingCategories ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
@@ -249,196 +306,353 @@ export default function Home() {
       </div>
     </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
-        {searchQuery.trim() !== "" ? (
-          <section className="scroll-mt-32">
-            <h2 className="text-2xl font-bold mb-6">
-              Kết quả tìm kiếm cho &quot;{searchQuery}
-              <span className="text-lg font-normal text-gray-600 ml-3">
-                ({filteredProducts.length} món)
-              </span>
-            </h2>
+  <div className="max-w-7xl mx-auto px-4 py-8 space-y-16-16">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
+        <div className="text-red-600">
+          <TicketIcon className="w-8 h-8">
+          </TicketIcon>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-900">Miễn Phí giao hàng</h4>
+          <p className="text-gray-500 text-sm">Miễn phí ship với đơn hàng từ 200k</p>
+        </div>
+      </div>
 
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-20 bg-gray-50 rounded-2xl">
-                <div className="mx-auto w-32 h-32 mb-6 opacity-50">
-                  <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <p className="text-xl text-gray-600 font-medium">Không tìm thấy món ăn nào</p>
-                <p className="text-gray-500 mt-2">Thử dùng từ khóa khác nhé!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {filteredProducts.map((p) => (
-                  <div
-                    key={p._id}
-                    className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
-                    onClick={() => handleOpenProductDetail(p)}
-                  >
-                    <Image
-                      src={p.image || "/placeholder.jpg"}
-                      alt={p.name}
-                      width={300}
-                      height={200}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="p-4 text-center">
-                      <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
-                        {p.name}
-                      </h3>
-                      <p className="text-red-600 font-bold mt-2 text-lg">
-                        {p.price.toLocaleString()}đ
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        ) : (
-          <>
-            {productsByCategory.length === 0 && !loadingProducts ? (
-              <div className="text-center py-20">
-                <p className="text-xl text-gray-600">Chưa có sản phẩm nào</p>
-              </div>
-            ) : (
-              productsByCategory.map(({ category, products }) => (
-                <section
-                  key={category._id}
-                  id={category.name}
-                  data-category={category.name}
-                  ref={(el) => {
-                    sectionRefs.current[category.name] = el;
-                  }}
-                  className="scroll-mt-48"
-                >
-                  <div className="flex items-center justify-center mb-6">
-                    <span className="h-[2px] w-64 bg-red-600 mr-4"></span>
+      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
+        <div className="text-red-600">
+          <BoxIcon className="w-8 h-8 ">
+          </BoxIcon>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-900">COD</h4>
+          <p className="text-gray-500 text-sm">Thanh toán khi nhận hàng</p>
+        </div>
+      </div>
 
-                    <h2 className="text-2xl font-bold text-center">
-                      {category.name}
-                    </h2>
-                    <span className="h-[2px] w-64 bg-red-600 ml-4"></span>
-                  </div>
-                  {loadingProducts ? (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      {Array.from({ length: 8 }).map((_, i) => (
-                        <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
-                      ))}
-                    </div>
-                  ) : products.length === 0 ? (
-                    <p className="text-center text-gray-500 py-12 text-lg">
-                      Chưa có sản phẩm trong danh mục này
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                      {products.map((p) => (
-                        <div
-                          key={p._id}
-                          className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
-                          onClick={() => handleOpenProductDetail(p)}
-                        >
-                          <Image
-                            src={p.image || "/placeholder.jpg"}
-                            alt={p.name}
-                            width={300}
-                            height={200}
-                            className="w-full h-40 object-cover"
-                          />
-                          <div className="p-4 text-center">
-                            <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
-                              {p.name}
-                            </h3>
-                            <p className="text-red-600 font-bold mt-2 text-lg">
-                              {p.price.toLocaleString()}đ
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              ))
-            )}
-          </>
-        )}
-      </main>
-    <Dialog open={openProductDetail} onOpenChange={setOpenProductDetail}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl shadow-2xl">
-        <DialogTitle className="sr-only">
-          {selectedProduct?.name ?? "Chi tiết sản phẩm"}
-        </DialogTitle>
+      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
+        <div className="text-red-600">
+          <DiamondIcon className="w-8 h-8">
+          </DiamondIcon>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-900">Khách hàng VIP</h4>
+          <p className="text-gray-500 text-sm">Ưu đãi dành riêng cho khách VIP</p>
+        </div>
+      </div>
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setOpenProductDetail(false)}
-            aria-label="Đóng"
-            className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-white transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
+      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
+        <div className="text-red-600">
+          <Bell className="w-8 h-8 ">
+          </Bell>
+        </div>
+        <div>
+          <h4 className="font-semibold text-gray-900">Hỗ trợ 24/7</h4>
+          <p className="text-gray-500 text-sm">Đội ngũ hỗ trợ luôn sẵn sàng</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          <div className="relative h-80 bg-gray-100">
-            <Image
-              src={selectedProduct?.image || "/placeholder.jpg"}
-              alt={selectedProduct?.name || "Món ăn"}
-              fill
-              className="object-cover"
-              priority
-            />
+  <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
+    {searchQuery.trim() !== "" ? (
+      <section className="scroll-mt-32">
+        <h2 className="text-2xl font-bold mb-6">
+          Kết quả tìm kiếm cho &quot;{searchQuery}
+          <span className="text-lg font-normal text-gray-600 ml-3">
+            ({filteredProducts.length} món)
+          </span>
+        </h2>
+
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-20 bg-gray-50 rounded-2xl">
+            <div className="mx-auto w-32 h-32 mb-6 opacity-50">
+              <svg className="w-full h-full text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <p className="text-xl text-gray-600 font-medium">Không tìm thấy món ăn nào</p>
+            <p className="text-gray-500 mt-2">Thử dùng từ khóa khác nhé!</p>
           </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {filteredProducts.map((p) => (
+              <div
+                key={p._id}
+                className="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
+                onClick={() => handleOpenProductDetail(p)}
+              >
+                <Image
+                  src={p.image || "/placeholder.jpg"}
+                  alt={p.name}
+                  width={300}
+                  height={200}
+                  className="w-full h-40 object-cover"
+                />
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
+                    {p.name}
+                  </h3>
+                  <p className="text-red-600 font-bold mt-2 text-lg">
+                    {p.price.toLocaleString()}đ
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    ) : (
+      <>
+        {productsByCategory.length === 0 && !loadingProducts ? (
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-600">Chưa có sản phẩm nào</p>
+          </div>
+        ) : (
+          productsByCategory.map(({ category, products }) => (
+            <section
+              key={category._id}
+              id={category.name}
+              data-category={category.name}
+              ref={(el) => {
+                sectionRefs.current[category.name] = el;
+              }}
+              className="scroll-mt-48"
+            >
+              <div className="flex items-center justify-center mb-6">
+                <span className="h-[2px] w-64 bg-red-600 mr-4"></span>
 
-          <div className="p-6 space-y-6">
+                <h2 className="text-2xl font-bold text-center">
+                  {category.name}
+                </h2>
+                <span className="h-[2px] w-64 bg-red-600 ml-4"></span>
+              </div>
+              {loadingProducts ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-xl" />
+                  ))}
+                </div>
+              ) : products.length === 0 ? (
+                <p className="text-center text-gray-500 py-12 text-lg">
+                  Chưa có sản phẩm trong danh mục này
+                </p>
+              ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {products.map((p) => {
+                  const isFavorite = favoriteIds.includes(p._id);
+                  return (
+                    <div
+                      key={p._id}
+                      className="relative bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
+                      onClick={() => handleOpenProductDetail(p)}
+                    >
+                      <button
+                        className="absolute top-3 right-3 z-10 bg-white/90 rounded-full p-2 hover:scale-110 transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFavorite(p._id, isFavorite);
+                        }}
+                      >
+                        <Heart
+                          size={20}
+                          className={
+                            isFavorite
+                              ? "fill-red-500 text-red-500"
+                              : "text-gray-400"
+                          }
+                        />
+                      </button>
+
+                      <Image
+                        src={p.image || "/placeholder.jpg"}
+                        alt={p.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-40 object-cover"
+                      />
+
+                      <div className="p-4 text-center">
+                        <h3 className="font-semibold text-gray-900 line-clamp-2 min-h-[3rem] flex items-center justify-center">
+                          {p.name}
+                        </h3>
+                        <p className="text-red-600 font-bold mt-2 text-lg">
+                          {p.price.toLocaleString()}đ
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              )}
+            </section>
+
+          ))
+        )}
+      </>
+    )}
+  </main>
+
+  <Dialog open={openProductDetail} onOpenChange={setOpenProductDetail}>
+    <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-2xl shadow-2xl h-[80vh] w-full">
+      <DialogTitle className="sr-only">
+        {selectedProduct?.name ?? "Chi tiết sản phẩm"}
+      </DialogTitle>
+
+      <div className="relative grid grid-cols-1 md:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => setOpenProductDetail(false)}
+          aria-label="Đóng"
+          className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:bg-white transition"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="relative h-64 md:h-full bg-gray-100">
+          <Image
+            src={selectedProduct?.image || "/placeholder.jpg"}
+            alt={selectedProduct?.name || "Món ăn"}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+
+        <div className="p-6 flex flex-col justify-between">
+          <div className="space-y-4">
             <h2 className="text-2xl font-bold text-gray-900">
               {selectedProduct?.name}
             </h2>
 
             <p className="text-gray-600 leading-relaxed">
-              {selectedProduct?.description || "Món ăn thơm ngon, chất lượng cao cấp."}
+              {selectedProduct?.description ||
+                "Món ăn thơm ngon, chất lượng cao cấp."}
             </p>
+          </div>
 
-            <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-5">
-                <button
-                  type="button"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-11 h-11 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
-                  aria-label="Giảm số lượng"
-                >
-                  <Minus className="w-5 h-5" />
-                </button>
+          <div className="mt-6 pt-6 border-t border-gray-200 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
+                aria-label="Giảm số lượng"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
 
-                <span className="text-2xl font-bold w-16 text-center">{quantity}</span>
-
-                <button
-                  type="button"
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-11 h-11 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
-                  aria-label="Tăng số lượng"
-                >
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
+              <span className="text-xl font-bold w-12 text-center">
+                {quantity}
+              </span>
 
               <button
                 type="button"
-                onClick={handleAddToCart}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold text-lg px-6 py-3 rounded-full shadow-xl transition-all flex items-center gap-3"
-                aria-label="Thêm vào giỏ hàng"
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition"
+                aria-label="Tăng số lượng"
               >
-                <span>Thêm vào giỏ hàng</span>
-                <span className="font-bold">
-                  - {(selectedProduct?.price ? (selectedProduct.price * quantity) : 0).toLocaleString()}đ
-                </span>
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Add to cart */}
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-3 rounded-full shadow-xl transition-all flex items-center gap-2"
+              aria-label="Thêm vào giỏ hàng"
+            >
+              <span>Thêm</span>
+              <span>
+                {(selectedProduct?.price
+                  ? selectedProduct.price * quantity
+                  : 0
+                ).toLocaleString()}
+                đ
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  <button
+    onClick={() => setIsOpen(!isOpen)}
+    className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-110"
+  >
+    {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+  </button>
+      {isOpen && (
+        <div className="fixed bottom-24 right-6 z-50 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col transition-all duration-300 border border-gray-200">
+          <div className="bg-red-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
+            <h3 className="font-semibold text-lg">Chat với AI</h3>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="hover:bg-red-700 p-1 rounded-full transition"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            {chatMessages.length === 0 ? (
+              <p className="text-center text-gray-500 mt-20">
+                Hãy bắt đầu cuộc trò chuyện!
+              </p>
+            ) : (
+              chatMessages.map((m, i) => (
+                <div
+                  key={i}
+                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-xs px-4 py-2 rounded-2xl ${
+                      m.role === 'user'
+                        ? 'bg-red-500 text-white'
+                        : 'bg-gray-200 text-gray-800'
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))
+            )}
+            {chatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-200 text-gray-600 px-4 py-2 rounded-2xl">
+                  Đang suy nghĩ...
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Nhập tin nhắn..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                disabled={chatLoading}
+              />
+              <button
+                onClick={handleSendChat}
+                disabled={chatLoading || !chatInput.trim()}
+                className={`px-5 py-2 rounded-full text-white font-medium transition ${
+                  chatLoading || !chatInput.trim()
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700'
+                }`}
+              >
+                Gửi
               </button>
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
 
     <footer className="h-20 bg-gray-900 text-gray-300 border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-center">

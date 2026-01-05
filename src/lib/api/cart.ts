@@ -21,7 +21,7 @@ export async function addToCart(
   if (!res.ok) {
     return {
       success: false,
-      message: data.message || "Thêm sản phẩm vào giỏ thất bại",
+      message: "Đăng nhập để thêm vào giỏ hàng",
     }
   }
   return {
@@ -49,7 +49,7 @@ export async function getCart(): Promise<ApiResponse<{ cart: Cart | null }>> {
   if (!res.ok) {
     return {
       success: false,
-      message: data.message||"Không thể lấy giỏ hàng",
+      message: "Giỏ hàng trống",
     }
   }
   return {

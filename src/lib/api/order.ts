@@ -54,7 +54,7 @@ export async function getMyOrders(
   if (!res.ok) {
     return {
       success: false,
-      message: data.message || "Không thể lấy danh sách đơn hàng",
+      message: "Đơn hàng trống.",
     };
   }
 
