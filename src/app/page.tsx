@@ -272,36 +272,35 @@ export default function Home() {
           </div>
 
           <div
-  className={`flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0
-    transition-all duration-300
-    ${isSearchOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
-  `}
->
-
-            {loadingCategories ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
-              ))
-            ) : (
-              categories.map((c) => (
-                <a
-                  key={c._id}
-                  href={`#${c.name}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }}
-                  className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
-                    ${activeCategory === c.name
-                      ? "text-red-600 border-red-600"
-                      : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
-                    }`}
-                >
-                  {c.name}
-                </a>
-              ))
-            )}
-          </div>
+            className={`flex gap-10 lg:gap-12 items-center whitespace-nowrap min-w-0
+              transition-all duration-300
+              ${isSearchOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}
+            `}
+          >
+              {loadingCategories ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="w-32 h-8 bg-gray-200 animate-pulse rounded-lg" />
+                ))
+              ) : (
+                categories.map((c) => (
+                  <a
+                    key={c._id}
+                    href={`#${c.name}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById(c.name)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className={`font-bold text-lg lg:text-xl pb-4 border-b-4 transition-all duration-300 flex-shrink-0
+                      ${activeCategory === c.name
+                        ? "text-red-600 border-red-600"
+                        : "text-gray-600 border-transparent hover:text-red-600 hover:border-red-600"
+                      }`}
+                  >
+                    {c.name}
+                  </a>
+                ))
+              )}
+            </div>
         </div>
       </div>
     </nav>
@@ -419,14 +418,20 @@ export default function Home() {
               }}
               className="scroll-mt-48"
             >
-              <div className="flex items-center justify-center mb-6">
-                <span className="h-[2px] w-64 bg-red-600 mr-4"></span>
-
-                <h2 className="text-2xl font-bold text-center">
+            <div className="flex flex-col items-center justify-center mb-8">
+              <div className="flex justify-center w-full max-w-4xl mx-auto">
+                <h2 className="text-5xl font-extrabold text-center text-red-600 uppercase tracking-wider">
                   {category.name}
                 </h2>
-                <span className="h-[2px] w-64 bg-red-600 ml-4"></span>
               </div>
+              <div className="mt-6 flex items-center w-full max-w-md">
+                <div className="flex-grow border-t-2 border-gray-600"></div>
+                <h3 className="mx-6 text-lg font-medium text-center text-gray-700 italic">
+                  {category.description}
+                </h3>
+                <div className="flex-grow border-t-2 border-gray-600"></div>
+                </div>
+            </div>
               {loadingProducts ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   {Array.from({ length: 8 }).map((_, i) => (

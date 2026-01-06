@@ -204,7 +204,7 @@ export function useHomePage() {
       }
     },
     {
-      rootMargin: "-140px 0px -55% 0px",
+      rootMargin: '-100px 0px -50% 0px',
       threshold: 0.25,
     }
   );
