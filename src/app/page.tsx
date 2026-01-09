@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
-import { Facebook, Instagram, X, Minus, Plus, Heart,  Bell, ShoppingCart, User, DiamondIcon, BoxIcon, TicketIcon , MessageCircle} from "lucide-react";
+import { Facebook, Instagram, X, Minus, Plus, Heart,  Bell, ShoppingCart, 
+  User, MessageCircle, Truck, CreditCard, ShieldCheck, FlaskConical, Leaf,
+  Crown, Headphones} from "lucide-react";
 import Link from "next/link";
 import {
   Sheet,
@@ -21,6 +23,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 import { useHomePage } from "@/hooks/user/home";
 
@@ -29,7 +33,9 @@ const banners = [
   "https://res.cloudinary.com/dp7acjc88/image/upload/v1765608918/foodapp/mmat8b39j0padnqpsp4r.png",
   "https://res.cloudinary.com/dp7acjc88/image/upload/v1765609022/foodapp/ouselslipeeclr2bss8m.png",
   "https://res.cloudinary.com/dp7acjc88/image/upload/v1765608971/foodapp/kjs2sscj6wdpkdnmkddr.png",
-  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765607909/Screenshot_2025-12-13_133738_pitczb.png"
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1765607909/Screenshot_2025-12-13_133738_pitczb.png",
+  "https://res.cloudinary.com/dp7acjc88/image/upload/v1767955056/anh-sang-trong-thiet-ke-bep-quan-an_qap0vg.jpg",
+
 ];
 export default function Home() {
   const {
@@ -304,54 +310,6 @@ export default function Home() {
         </div>
       </div>
     </nav>
-
-  <div className="max-w-7xl mx-auto px-4 py-8 space-y-16-16">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
-        <div className="text-red-600">
-          <TicketIcon className="w-8 h-8">
-          </TicketIcon>
-        </div>
-        <div>
-          <h4 className="font-semibold text-gray-900">Miễn Phí giao hàng</h4>
-          <p className="text-gray-500 text-sm">Miễn phí ship với đơn hàng từ 200k</p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
-        <div className="text-red-600">
-          <BoxIcon className="w-8 h-8 ">
-          </BoxIcon>
-        </div>
-        <div>
-          <h4 className="font-semibold text-gray-900">COD</h4>
-          <p className="text-gray-500 text-sm">Thanh toán khi nhận hàng</p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
-        <div className="text-red-600">
-          <DiamondIcon className="w-8 h-8">
-          </DiamondIcon>
-        </div>
-        <div>
-          <h4 className="font-semibold text-gray-900">Khách hàng VIP</h4>
-          <p className="text-gray-500 text-sm">Ưu đãi dành riêng cho khách VIP</p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4 bg-white rounded-xl shadow p-6">
-        <div className="text-red-600">
-          <Bell className="w-8 h-8 ">
-          </Bell>
-        </div>
-        <div>
-          <h4 className="font-semibold text-gray-900">Hỗ trợ 24/7</h4>
-          <p className="text-gray-500 text-sm">Đội ngũ hỗ trợ luôn sẵn sàng</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <main className="max-w-7xl mx-auto px-4 py-8 space-y-16">
     {searchQuery.trim() !== "" ? (
@@ -658,6 +616,149 @@ export default function Home() {
           </div>
         </div>
       )}
+
+<section className="bg-gradient-to-b from-gray-50 to-white py-10 md:py-20">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl md:text-5xl font-bold text-red-600 tracking-tight">
+        Không gian bếp của chúng tôi
+      </h2>
+      <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+        Sạch sẽ – An toàn – Chuẩn vệ sinh thực phẩm
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-16">
+      <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-300 hover:scale-[1.03]">
+        <Image
+          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1767955057/khong-gian-bep-quan-an_f7rznj.jpg" 
+          alt="Không gian bếp"
+          width={800}
+          height={600}
+          className="object-cover w-full h-72 md:h-80"
+          priority
+        />
+      </div>
+      <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-300 hover:scale-[1.03]">
+        <Image
+          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1767955056/anh-sang-trong-thiet-ke-bep-quan-an_qap0vg.jpg"
+          alt="Ánh sáng"
+          width={800}
+          height={600}
+          className="object-cover w-full h-72 md:h-80"
+        />
+      </div>
+      <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-300 hover:scale-[1.03]">
+        <Image
+          src="https://res.cloudinary.com/dp7acjc88/image/upload/v1767955056/he-thong-thong-gio-hut-mui-bep_pvgt1o.jpg"
+          alt="Hệ thống thông gió"
+          width={800}
+          height={600}
+          className="object-cover w-full h-72 md:h-80"
+        />
+      </div>
+    </div>
+
+    <Card className="border-none shadow-2xl bg-white/80 backdrop-blur-sm">
+      <CardContent className="p-8 md:p-10">
+        <h3 className="text-3xl font-bold text-center text-red-600 mb-10">
+          Chất lượng nguyên liệu
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-green-50 to-green-100 text-green-600 text-4xl shadow-md transition-transform group-hover:scale-110 duration-300">
+              <ShieldCheck className="w-10 h-10">
+              </ShieldCheck>
+            </div>
+            <h4 className="text-xl font-bold text-green-700">Tươi mỗi ngày</h4>
+            <p className="text-gray-600 leading-relaxed">
+              Nguyên liệu được nhập mới 100% mỗi ngày từ các nhà cung cấp uy tín, đảm bảo độ tươi ngon tối ưu.
+            </p>
+          </div>
+
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 text-4xl shadow-md transition-transform group-hover:scale-110 duration-300">
+              <FlaskConical className=" w-10 h-10"></FlaskConical>
+            </div>
+            <h4 className="text-xl font-bold text-blue-700">Kiểm định nghiêm ngặt</h4>
+            <p className="text-gray-600 leading-relaxed">
+              Đạt chuẩn VSATTP, kiểm soát chất lượng từ khâu đầu vào đến chế biến với quy trình khép kín.
+            </p>
+          </div>
+
+          <div className="text-center space-y-4 group">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-red-50 to-red-100 text-red-600 text-4xl shadow-md transition-transform group-hover:scale-110 duration-300">
+              <Leaf className="h-10 w-10"></Leaf>
+            </div>
+            <h4 className="text-xl font-bold text-red-700">Không chất bảo quản</h4>
+            <p className="text-gray-600 leading-relaxed">
+              Cam kết tuyệt đối không sử dụng chất bảo quản độc hại, mang đến món ăn an toàn và tự nhiên nhất.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 text-center">
+          <Badge
+            variant="outline"
+            className="text-sm md:text-basepx-6 py-2 border border-green-700 text-green-800 uppercase tracking-wide"
+          >
+            Chứng nhận VSATTP Quốc Gia
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+    <div className="text-center mb-12 mt-20">
+      <h2 className="text-3xl md:text-4xl font-bold text-red-600">
+        Vì sao bạn nên chọn chúng tôi?
+      </h2>
+      <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+        Cam kết mang đến trải nghiệm tốt nhất từ đặt hàng đến tận tay bạn
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
+        <CardContent className="p-6 flex flex-col items-center text-center">
+          <div className="mb-4 p-4 rounded-full bg-gradient-to-br from-red-50 to-red-100 text-red-600 group-hover:scale-110 transition-transform">
+            <Truck className="w-10 h-10" strokeWidth={1.8} /> 
+          </div>
+          <h4 className="font-bold text-xl text-gray-900 mb-2">Miễn Phí Giao Hàng</h4>
+          <p className="text-gray-600 text-sm">Áp dụng cho mọi đơn từ 200.000đ trở lên</p>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
+        <CardContent className="p-6 flex flex-col items-center text-center">
+          <div className="mb-4 p-4 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 group-hover:scale-110 transition-transform">
+            <CreditCard className="w-10 h-10" strokeWidth={1.8} />
+          </div>
+          <h4 className="font-bold text-xl text-gray-900 mb-2">Thanh Toán COD</h4>
+          <p className="text-gray-600 text-sm">Nhận hàng - Kiểm tra - Thanh toán tại nhà</p>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
+        <CardContent className="p-6 flex flex-col items-center text-center">
+          <div className="mb-4 p-4 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 group-hover:scale-110 transition-transform">
+            <Crown className="w-10 h-10" strokeWidth={1.8} />
+          </div>
+          <h4 className="font-bold text-xl text-gray-900 mb-2">Ưu Đãi VIP</h4>
+          <p className="text-gray-600 text-sm">Giảm giá độc quyền & quà tặng đặc biệt</p>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300 group">
+        <CardContent className="p-6 flex flex-col items-center text-center">
+          <div className="mb-4 p-4 rounded-full bg-gradient-to-br from-green-50 to-green-100 text-green-600 group-hover:scale-110 transition-transform">
+            <Headphones className="w-10 h-10" strokeWidth={1.8} />
+          </div>
+          <h4 className="font-bold text-xl text-gray-900 mb-2">Hỗ Trợ 24/7</h4>
+          <p className="text-gray-600 text-sm">Đội ngũ sẵn sàng giải đáp mọi lúc</p>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+</section>
 
     <footer className="h-20 bg-gray-900 text-gray-300 border-t border-gray-800">
       <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-center">
