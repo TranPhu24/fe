@@ -199,8 +199,7 @@ const showOrderStatusToast = (status: string) => {
   const canCancel =
   order.orderStatus === "pending" &&
   !(
-    order.paymentMethod === "VNPAY" &&
-    order.paymentStatus === "failed"
+    order.paymentMethod === "VNPAY" 
   );
 
     const handleLogout = () => {

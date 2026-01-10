@@ -278,8 +278,7 @@ export function EmployeeOrderPage() {
               {(order.orderStatus === "pending" ||
                 order.orderStatus === "confirmed") &&
                 !(
-                  order.paymentMethod === "VNPAY" &&
-                  order.paymentStatus === "failed"
+                  order.paymentMethod === "VNPAY" 
                 ) && (
                   <button
                     onClick={() => {
