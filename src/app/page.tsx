@@ -75,6 +75,8 @@ export default function Home() {
     favoriteIds,
     handleToggleFavorite,
   } = useHomePage();
+  const stock = selectedProduct?.stock ?? 0;
+
   
   return (
   <>
@@ -209,6 +211,8 @@ export default function Home() {
       </DialogContent>
     </Dialog>
     </header>
+
+    {/* Banner Carousel */}
     <section className="w-full bg-white">
       <Carousel opts={{ loop: true }} className="w-full">
         <CarouselContent>
@@ -492,6 +496,23 @@ export default function Home() {
               {selectedProduct?.description ||
                 "Món ăn thơm ngon, chất lượng cao cấp."}
             </p>
+
+<p className="text-sm text-gray-600 flex items-center gap-2.5">
+  Tồn kho:
+  <span
+    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium shadow-sm
+      ${
+        stock === 0
+          ? "bg-gradient-to-r from-red-50 to-red-100 text-red-700 border border-red-200"
+          : stock <= 5
+          ? "bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border border-amber-200"
+          : "bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 border border-emerald-200"
+      }`}
+  >
+    {stock === 0 ? "Hết" : stock}
+  </span>
+</p>
+
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200 flex items-center justify-between gap-4">
@@ -540,7 +561,7 @@ export default function Home() {
       </div>
     </DialogContent>
   </Dialog>
-
+  {/*Chat */}
   <button
     onClick={() => setIsOpen(!isOpen)}
     className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all duration-300 hover:scale-110"
@@ -672,7 +693,7 @@ export default function Home() {
             </div>
             <h4 className="text-xl font-bold text-green-700">Tươi mỗi ngày</h4>
             <p className="text-gray-600 leading-relaxed">
-              Nguyên liệu được nhập mới 100% mỗi ngày từ các nhà cung cấp uy tín, đảm bảo độ tươi ngon tối ưu.
+              Nguyên liệu được nhập mới 100% mỗi ngày từ các nhà cung cấp uy tín.
             </p>
           </div>
 
@@ -682,7 +703,7 @@ export default function Home() {
             </div>
             <h4 className="text-xl font-bold text-blue-700">Kiểm định nghiêm ngặt</h4>
             <p className="text-gray-600 leading-relaxed">
-              Đạt chuẩn VSATTP, kiểm soát chất lượng từ khâu đầu vào đến chế biến với quy trình khép kín.
+              Kiểm soát chất lượng từ khâu đầu vào đến chế biến với quy trình khép kín.
             </p>
           </div>
 
@@ -692,7 +713,7 @@ export default function Home() {
             </div>
             <h4 className="text-xl font-bold text-red-700">Không chất bảo quản</h4>
             <p className="text-gray-600 leading-relaxed">
-              Cam kết tuyệt đối không sử dụng chất bảo quản độc hại, mang đến món ăn an toàn và tự nhiên nhất.
+              Cam kết tuyệt đối không sử dụng chất bảo quản độc hại.
             </p>
           </div>
         </div>

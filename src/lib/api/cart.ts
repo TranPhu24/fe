@@ -21,7 +21,7 @@ export async function addToCart(
   if (!res.ok) {
     return {
       success: false,
-      message: "Đăng nhập để thêm vào giỏ hàng",
+      message: data.message || "Đăng nhập để thêm vào giỏ hàng",
     }
   }
   return {
