@@ -123,3 +123,31 @@ ApiResponse<null>> {
     data: null,
   };
 }
+
+export async function deleteDiscount(
+  id: string
+): Promise<ApiResponse<null>> {
+  const accessToken = Cookies.get("access_token");
+
+  const res = await fetch(`${API_BASE}/api/discounts/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return {
+      success: false,
+      message: data.message || "Không thể xóa thông báo",
+    };
+  }
+
+  return {
+    success: true,
+    message: data.message || "Xóa thông báo thành công",
+    data: null,
+  };
+}

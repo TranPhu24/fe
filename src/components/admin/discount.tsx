@@ -31,6 +31,7 @@ export function DiscountPage() {
     loading,
     discounts,
     handleAddDiscount,
+    handleDelete
   } = useDiscount();
   
   const renderDiscountList = () => (
@@ -74,6 +75,7 @@ export function DiscountPage() {
               </div>
 
               <button
+                onClick={() => handleDelete(d._id)}
                 className="absolute top-2 right-2 p-1 rounded-full hover:bg-red-100 transition"
               >
                 <TrashIcon className="w-4 h-4 text-red-500" />
@@ -142,7 +144,6 @@ export function DiscountPage() {
             <SelectItem value="freeship">Free ship</SelectItem>
         </SelectContent>
         </Select>
-
 
           {form.type !== "freeship" && (
             <Input

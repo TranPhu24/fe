@@ -84,3 +84,4 @@ export async function deleteNotification(
     data: null,
   };
 }
+

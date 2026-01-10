@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import {createDiscount,getAllDiscounts,} from "@/lib/api/discount";
+import {createDiscount,deleteDiscount,getAllDiscounts,} from "@/lib/api/discount";
 import { Discount, CreateDiscountDTO } from "@/lib/api/types";
 export function useDiscount() {
 
@@ -83,6 +83,22 @@ export function useDiscount() {
       setSubmitting(false);
     }
   };
+
+    const handleDelete = async (id: string) => {
+      try {
+        const res = await deleteDiscount(id);
+  
+        if (!res.success) {
+          toast.error(res.message);
+          return;
+        }
+  
+        toast.success("Xóa thông báo thành công");
+        await loadData();
+      } catch {
+        toast.error("Xóa thông báo thất bại");
+      }
+    };
     return {
     discounts,
     loading,
@@ -90,5 +106,6 @@ export function useDiscount() {
     setForm,
     submitting,
     handleAddDiscount,
+    handleDelete,
   }
 }
