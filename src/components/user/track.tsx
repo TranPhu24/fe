@@ -196,6 +196,13 @@ const showOrderStatusToast = (status: string) => {
     }
   };
 
+  const canCancel =
+  order.orderStatus === "pending" &&
+  !(
+    order.paymentMethod === "VNPAY" &&
+    order.paymentStatus === "failed"
+  );
+
     const handleLogout = () => {
     Cookies.remove("access_token")
     router.push("/auth/login")}
@@ -396,14 +403,15 @@ const showOrderStatusToast = (status: string) => {
         <p className="text-lg">Thanh toán: <b>{order.paymentMethod}</b></p>
         <p className="text-lg">Tổng cộng: <span className="text-red-600"><b>{order.finalTotal.toLocaleString()}đ</b></span></p>
       </div>
-      {order.orderStatus === "pending" && (
-        <button
-          onClick={() => setOpenCancel(true)}
-          className="w-full bg-gray-200 hover:bg-gray-300 rounded-xl py-3 font-semibold"
-        >
-          Huỷ đơn
-        </button>
-      )}
+{canCancel && (
+  <button
+    onClick={() => setOpenCancel(true)}
+    className="w-full bg-gray-200 hover:bg-gray-300 rounded-xl py-3 font-semibold"
+  >
+    Huỷ đơn
+  </button>
+)}
+
       <Dialog open={openCancel} onOpenChange={setOpenCancel}>
         <DialogContent className="max-w-sm rounded-2xl">
           <DialogTitle className="text-lg font-bold">

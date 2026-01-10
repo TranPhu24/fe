@@ -157,6 +157,8 @@ export function EmployeeOrderPage() {
     return matchOrderStatus && matchPaymentStatus && matchDate;
 });
 
+
+
   return (
     <>
       <div className="p-6 w-full min-w-[80vw] mx-auto">
@@ -236,12 +238,18 @@ export function EmployeeOrderPage() {
                 {order.shippingAddress.ward},{" "}
                 {order.shippingAddress.city}
                 </p>
+                <p className="text-sm text-gray-500">
+                  <b>Phương thức thanh toán:</b> {order.paymentMethod}
+                </p>
 
               </div>
 
               <div className="flex items-center gap-3">
                 {order.orderStatus !== "completed" &&
-                  order.orderStatus !== "cancelled" && (
+                  order.orderStatus !== "cancelled" &&  !(
+                      order.paymentMethod === "VNPAY" &&
+                      order.paymentStatus === "failed"
+                    ) && (
                     <select
                       value={order.orderStatus}
                       disabled={updatingId === order._id}
@@ -267,8 +275,12 @@ export function EmployeeOrderPage() {
                     </select>
                   )}
 
-                {(order.orderStatus === "pending" ||
-                  order.orderStatus === "confirmed") && (
+              {(order.orderStatus === "pending" ||
+                order.orderStatus === "confirmed") &&
+                !(
+                  order.paymentMethod === "VNPAY" &&
+                  order.paymentStatus === "failed"
+                ) && (
                   <button
                     onClick={() => {
                       setSelectedOrderId(order._id);
